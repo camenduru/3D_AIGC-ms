@@ -286,7 +286,7 @@ with gr.Blocks(css=css) as demo:
     with gr.Tab("文本生成 (敬请期待)"):
         gr.Markdown("## <center>Coming soon!</center>")
     with gr.Column():
-        gr.HTML("<h2 style='text-align:center; margin-top: 20px;'>模型案例</h2>")
+        gr.HTML("<h2 style='text-align:center; margin-top: 20px;'>精选模型</h2>")
         featured_projects_html = gr.HTML(elem_id="featured_projects_container")
     demo.load(fn=gr_on_load, inputs=uuid_txt, outputs=[jwt_token_txt, projects_html, featured_projects_html], _js=app_js)\
         .then(fn=None,
