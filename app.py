@@ -168,7 +168,7 @@ def temp_btn_on_click(model_url_txt):
 def gr_on_load(uuid):
     print(f"Triggered fetch_uuid: {uuid}", flush=True)
 
-    test_user_id = uuid 
+    test_user_id = uuid
     # NOTE: remove {test_user_id} and change to uuid when release
     if test_user_id:
         resp = login(client, test_user_id)
@@ -249,20 +249,21 @@ with gr.Blocks(css=css) as demo:
                   """)
 
         example_videos.select(sample_data_on_select,
-                              outputs=[source_video, model_state_container, remote_model_viewer])
-            #                 _js = """
-            #                         const example_videos = document.querySelector('#example_videos')
-            #                         example_videos.style.pointerEvents = "none"
-            #                         example_videos.style.opacity = 0.6
-            #                     }
-            #                   """)\
-            # .then(fn=None, _js="""
-            #     () => {
-            #         const example_videos = document.querySelector('#example_videos')
-            #         example_videos.style.pointerEvents = 'all'
-            #         example_videos.style.opacity = 1
-            #     }
-            # """)
+                              outputs=[source_video, model_state_container, remote_model_viewer],
+                              _js="""
+                                () => {
+                                    const example_videos = document.querySelector('#example_videos')
+                                    example_videos.style.pointerEvents = "none"
+                                    example_videos.style.opacity = 0.6
+                                }
+                              """)\
+            .then(fn=None, _js="""
+                () => {
+                    const example_videos = document.querySelector('#example_videos')
+                    example_videos.style.pointerEvents = 'all'
+                    example_videos.style.opacity = 1
+                }
+            """)
 
         temp_btn.click(temp_btn_on_click,
                        inputs=temp_btn,
