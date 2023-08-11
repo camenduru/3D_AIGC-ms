@@ -150,7 +150,7 @@ async () => {
         lightBoxVideo.play();
       })
       
-    document.querySelector("#fade").addEventListener('click', videoClose)
+    document.querySelector("#close_btn").addEventListener('click', videoClose)
     
     function videoClose() {
         var lightBoxVideo = document.getElementById("guide_video");
