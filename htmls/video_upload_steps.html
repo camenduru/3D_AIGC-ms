@@ -1,0 +1,45 @@
+<div id="video_upload_steps_container" style="display: flex; background: #f6f6f6; gap: 1%; border: 1px solid #e5e7eb; padding-bottom: 8px;">
+    <div class="step_container">
+        <h4 style="line-height: 22px;">1. 拍摄视频</h4>
+        <p style="line-height: 24px; margin-bottom: 0!important">观看拍摄教程并按规范拍摄一段视频</p>
+        <button id="view_guide_btn" class="action_btn">观看拍摄教程</button>
+    </div>
+    <div style="display: block; width: 2%; height: auto; margin: auto">
+        <img src="https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/arrow.png&View=true">
+    </div>
+    <div class="step_container">
+        <h4 style="line-height: 22px;">2. 选择视频</h4>
+        <p style="line-height: 24px; margin-bottom: 0!important">选择您拍摄的物体视频（1分钟左右）</p>
+        <input id="video_upload_input" type="file" accept="video/*" style="display:none;" />
+        <input id="select_video_btn" class="action_btn" type="button" value="选择视频" onclick="document.getElementById('video_upload_input').click();" />
+        <div id="video_info_container" style="display: none; align-items: center; border: 1px dashed #ccc; height: 32px; max-width: 280px; width: fit-content; position: relative; margin: 4px auto;">
+            <span id="video_name" style="padding: 0 8px; max-width: 200px; display:block; overflow:hidden; white-space: nowrap; text-overflow: ellipsis;">文件名</span>
+            <span id="video_size" style="padding: 0 4px;">(0M)</span>
+            <button id="clear_btn" style="display: flex; justify-content: center; align-items: center; position:absolute; top: -8px; right: -8px; width: 16px; padding: 2px; height: 16px; border: 1px solid #e5e7eb; background: #ccc;">
+                <div>
+                    <svg width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" stroke="currentColor" style="fill-rule: evenodd; clip-rule: evenodd; stroke-linecap: round; stroke-linejoin: round;">
+                        <g transform="matrix(1.14096,-0.140958,-0.140958,1.14096,-0.0559523,0.0559523)">
+                            <path d="M18,6L6.087,17.913" style="fill: none; fill-rule: nonzero; stroke-width: 2px;"></path>
+                        </g>
+                        <path d="M4.364,4.364L19.636,19.636" style="fill: none; fill-rule: nonzero; stroke-width: 2px;"></path>
+                    </svg>
+                </div>
+            </button>
+        </div>
+    </div>
+    <div style="display: block; width: 2%; height: auto; margin: auto">
+        <img src="https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/arrow.png&View=true">
+    </div>
+    <div class="step_container">
+        <h4 style="line-height: 22px;">3. 上传并生成3D模型</h4>
+        <div style="line-height: 24px;" ><input type="checkbox" id="share" name="share"><label for="share" style="padding-left: 4px;">申请展示到官方案例集</label></div>
+        <button id="upload_build_btn" class="action_btn" disabled>上传并生成模型</button>
+    </div>
+</div>
+<div style="display: flex; margin-top: 6px; width: 100%; opacity: 0.2; justify-content: center;">
+    <img style="height: 30px; " src="https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/double_arrow.png&View=true">
+</div>
+<div id="light">
+    <video id="guide_video" controls muted src="https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/guide.mp4&View=true"></video>
+</div>
+<div id="fade"></div>
