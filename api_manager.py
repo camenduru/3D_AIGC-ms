@@ -30,7 +30,7 @@ def create_project(client: Client, jwt, share):
     request = PopCreateObjectProjectRequest(jwt_token=jwt,
                                             title=f"魔搭项目_{int(time.time())}",
                                             mode="source",
-                                            biz_usage="inverse_rendering",
+                                            biz_usage="faster_inverse_rendering",
                                             auto_build=True,
                                             custom_source="model_scope",
                                             recommend_status="AGREE_SHARE" if share else "DISAGREE_SHARE")
