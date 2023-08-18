@@ -30,5 +30,5 @@ license: Apache License 2.0
 ---
 #### Clone with HTTP
 ```bash
- git clone https://www.modelscope.cn/studios/Damo_XR_Lab/3D_AIGC.git
+ git clone https://www.modelscope.cn/studios/ggmotest/gg_xr_test.git
 ```

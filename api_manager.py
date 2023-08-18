@@ -1,13 +1,11 @@
 import os
 import time
 
-import oss2
-import requests
 from alibabacloud_tea_openapi.models import Config
 from alibabacloud_xrengine20230313.client import Client
 from alibabacloud_xrengine20230313.models import PopCreateObjectProjectRequest, PopListObjectProjectRequest, \
     PopVideoSaveSourceRequest, PopBuildObjectProjectRequest, AuthUserRequest, LoginModelScopeRequest, \
-    PopListObjectCaseRequest
+    PopListObjectCaseRequest #, UpdateUserEmailRequest
 
 
 # ID [2023-07-12 10:43:36] Triggered fetch_uuid: a28d98c229cc31b26d226bae566cbb0
@@ -25,6 +23,10 @@ def refresh_jwt(client: Client, jwt):
 def login(client: Client, userid):
     return client.login_model_scope(LoginModelScopeRequest(token=userid, type="MODEL_SCOPE"))
 
+def update_user_email(client: Client, email, jwt):
+    #resp = client.update_user_email(UpdateUserEmailRequest(email, jwt_token=jwt))
+    print("update email:")
+    #return resp
 
 def create_project(client: Client, jwt, share):
     request = PopCreateObjectProjectRequest(jwt_token=jwt,

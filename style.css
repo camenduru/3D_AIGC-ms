@@ -335,3 +335,85 @@ span {
   .icon.svelte-lk9eg8 {
     opacity: .3;
   }
+
+
+
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 2000; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: white;
+  margin: 20% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 40%; /* Could be more or less, depending on screen size */
+  position: relative;
+  display: block;
+  text-align: center;
+  min-width: 400px;
+}
+
+/* The Close Button */
+.close {
+    position: absolute;
+    top: 2px;
+    right: 8px;
+    color: #aaa !important;
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 1;
+
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+a {
+    position: relative;
+    display: inline-block;
+}
+
+.action_img {
+    width: 30px;
+    border-radius: 15px !important;
+    background: white;
+ }
+
+a[data-tooltip]:hover:after {
+  content: attr(data-tooltip);
+  padding: 4px 8px;
+  color: white;
+  position: absolute;
+  border-radius: 2px;
+  left: 0;
+  top: -120%;
+  white-space: nowrap;
+  z-index: 2;
+  background: black;
+}
+
+a[data-tooltip]:hover:before {
+    position: absolute;
+    z-index: 10;
+    content: "";
+    left: 10%;
+    top: calc(-120% + 24px);
+    border-style: solid;
+    border-width: 8px 8px 8px 8px;
+    border-color: black transparent transparent transparent;
+}

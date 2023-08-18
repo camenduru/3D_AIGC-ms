@@ -6,7 +6,7 @@ from urllib.parse import quote
 
 import gradio as gr
 
-from api_manager import setup, list_projects, login, list_featured_projects, create_project_sts, action_post_upload
+from api_manager import setup, list_projects, login, list_featured_projects, create_project_sts, action_post_upload, update_user_email
 from samples import samples
 
 access_key_id = base64.b64decode(os.getenv("Var1", "")).decode("utf-8")
@@ -22,6 +22,7 @@ model_placeholder_html = Path("htmls/model_placeholder.html").read_text()
 model_build_failed_html = Path('htmls/model_build_failed.html').read_text()
 video_uploader_steps_html = Path('htmls/video_upload_steps.html').read_text()
 model3d_label_html = Path("htmls/model3d_label.html").read_text()
+model3d_actions_html = Path("htmls/model3d_actions.html").read_text()
 
 app_js = Path("app.js").read_text()
 upload_js = Path("upload.js").read_text()
@@ -29,16 +30,18 @@ upload_js = Path("upload.js").read_text()
 def model_preview_url(url, title):
     if not url:
         return ""
-    return f"https://market.m.taobao.com/app/xr-paas/xr-paas-portal/index.html#/h5-modelviewer?modelUrl={quote(url)}&modelName={quote(title)}&bizUsage=inverse_rendering"
+    return f"https://market.wapa.taobao.com/app/xr-paas/xr-paas-portal/index.html#/h5-modelviewer?modelUrl={quote(url)}&modelName={quote(title)}&bizUsage=inverse_rendering"
 
-def model_viewer_iframe(url, title):
+def model_viewer_iframe(url, title, show_actions: bool):
     model_iframe = f"""
     {model3d_label_html}
     <iframe class='model_container' src ='{model_preview_url(url, title)}'></iframe>
     """
+    if show_actions:
+        model_iframe = model3d_actions_html + model_iframe
     return model_iframe
 
-def project_video_constructor(video_url, status, model_url):
+def project_video_constructor(video_url, status, model_url, glb_url):
     if status == "CREATED":
         actual = "空项目"
         color = "white"
@@ -55,8 +58,9 @@ def project_video_constructor(video_url, status, model_url):
     actual_model_url = model_url if status == "VIEWABLE" else ""
     full_video_url = f"https:{video_url}"
     display_status = "display: none" if status == "VIEWABLE" else "display: block"
+    actual_glb_url = glb_url if status == "VIEWABLE" else ""
     return f"""
-        <div class='project_vid_container' data-model-url='{actual_model_url}' data-status='{status}' onclick='project_video_on_click(this)'>
+        <div class='project_vid_container' data-model-url='{actual_model_url}' data-glb-url='{actual_glb_url}' data-status='{status}' onclick='project_video_on_click(this)'>
             <div class='project_status_overlay' style='{display_status}'>
                 <p style='text-align: center; color: {color}; font-size: 16px; margin: 40% 0;'>{actual}</p>
             </div>
@@ -70,7 +74,7 @@ def sample_data_on_select(evt: gr.SelectData):
         item = samples[evt.index]
         return [source_video.update(value=item["video"]),
                 model_state_container.update(visible=False),
-                remote_model_viewer.update(value=model_viewer_iframe(item["model"], item["name"]),
+                remote_model_viewer.update(value=model_viewer_iframe(item["model"], item["name"], False),
                                            visible=True)
                 ]
     except IndexError:
@@ -79,6 +83,7 @@ def sample_data_on_select(evt: gr.SelectData):
 
 def upload_btn_on_click():
     return [
+        source_video.update(value=None),
         model_state_container.update(visible=True),
         remote_model_viewer.update(visible=False)
     ]
@@ -116,7 +121,9 @@ def fetch_project_list(jwt_token):
                             status = "MAKING_FAILED"
                         elif proj.audit_status == "INNIT":
                             status = "MAKING"
-                    return project_video_constructor(video_url, status, proj.dataset.model_url)
+
+                    glb_model_url = proj.dataset.build_result_url.get("glbModel", None)
+                    return project_video_constructor(video_url, status, proj.dataset.model_url, glb_model_url)
             except IndexError:
                 return ""
 
@@ -150,12 +157,17 @@ def featured_projects_html_constructor(jwt_token):
     except:
         raise gr.exceptions.Error("获取数据失败，请刷新重试。")
 
+def update_email_btn_click(email_txt, jwt_token):
+    print("new email", email_txt)
+    print("jwt:", jwt_token)
+    update_user_email(client, base64.b64encode(email_txt.encode()).decode("utf-8"), jwt_token)
+
 def temp_btn_on_click(model_url_txt):
     print("model_url_txt: ", model_url_txt)
     if model_url_txt:
         return [source_video.update(value="resource/guide.mp4"),
                 model_state_container.update(visible=False),
-                remote_model_viewer.update(visible=True, value=model_viewer_iframe(model_url_txt, ""))
+                remote_model_viewer.update(visible=True, value=model_viewer_iframe(model_url_txt, "", True))
                 ]
     else:
         return [
@@ -175,7 +187,9 @@ def gr_on_load(uuid):
         print("login response: ", resp)
         try:
             jwt = resp.body.data.jwt_token
+            email = "" #resp.body.data.email
             return [jwt_token_txt.update(jwt),
+                    usr_email_text.update(email),
                     projects_html.update(value=project_list_html_constructor(jwt)),
                     featured_projects_html.update(value=featured_projects_html_constructor(jwt))
                     ]
@@ -192,12 +206,13 @@ with gr.Blocks(css=css) as demo:
         with gr.Row():
             with gr.Column():
                 uuid_txt = gr.Text(label="modelscope_uuid", visible=False)
-                jwt_token_txt = gr.Text(label="modelscope_jwt_token", visible=False)
-
+                jwt_token_txt = gr.Text(label="modelscope_jwt_token", elem_id="jwt_token", visible=False)
                 upload_helper_txt = gr.Text(label="upload_helper", elem_id="upload_helper_txt", visible=False)
-                upload_completion_btn = gr.Button(elem_id="upload_completion_btn", visible=False)
+                usr_email_text = gr.Text(elem_id="user_email", visible=False)
+                update_email_btn = gr.Button(elem_id="gr_update_email_btn", visible=False)
                 share_checkbox = gr.Checkbox(False, label="同意分享至官方案例集", container=False, elem_id="gr_share_checkbox", visible=False)
                 upload_helper_btn = gr.Button("生成模型", elem_id="upload_helper_btn", visible=False)
+                upload_completion_btn = gr.Button(elem_id="upload_completion_btn", visible=False)
 
                 source_video = gr.Video(label="源视频",
                                         height=500,
@@ -233,7 +248,7 @@ with gr.Blocks(css=css) as demo:
         # fn 4. save source, build project, reload projects section and select the first one.
 
         upload_helper_btn.click(upload_btn_on_click,
-                                outputs=[model_state_container, remote_model_viewer])\
+                                outputs=[source_video, model_state_container, remote_model_viewer])\
             .then(prepare_for_upload,
                   inputs=[jwt_token_txt, share_checkbox],
                   outputs=upload_helper_txt) \
@@ -264,7 +279,7 @@ with gr.Blocks(css=css) as demo:
                     example_videos.style.opacity = 1
                 }
             """)
-
+        update_email_btn.click(update_email_btn_click, inputs=[usr_email_text, jwt_token_txt], _js="() => [document.querySelector('#user_email textarea').value, document.querySelector('#jwt_token textarea').value]")
         temp_btn.click(temp_btn_on_click,
                        inputs=temp_btn,
                        outputs=[source_video, model_state_container, remote_model_viewer],
@@ -276,7 +291,10 @@ with gr.Blocks(css=css) as demo:
                             if(source_video) {
                                 source_video.src = document.querySelector('#temp_btn').textContent
                                 source_video.play()
-                            } 
+                            }
+                            const glb_url = document.querySelector(".project_vid_container.selected").getAttribute("data-glb-url")
+                            const download_btn = document.querySelector("#download_link")
+                            download_btn?.setAttribute("href", glb_url) 
                         }
                   """)
     with gr.Tab("多图生成 (敬请期待)"):
@@ -286,9 +304,9 @@ with gr.Blocks(css=css) as demo:
     with gr.Tab("文本生成 (敬请期待)"):
         gr.Markdown("## <center>Coming soon!</center>")
     with gr.Column():
-        gr.HTML("<h2 style='text-align:center; margin-top: 20px;'>精选模型</h2>")
+        gr.HTML("<h2 style='text-align:center; margin-top: 20px;'>模型案例</h2>")
         featured_projects_html = gr.HTML(elem_id="featured_projects_container")
-    demo.load(fn=gr_on_load, inputs=uuid_txt, outputs=[jwt_token_txt, projects_html, featured_projects_html], _js=app_js)\
+    demo.load(fn=gr_on_load, inputs=uuid_txt, outputs=[jwt_token_txt, usr_email_text, projects_html, featured_projects_html], _js=app_js)\
         .then(fn=None,
               _js="""
                 () => {

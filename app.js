@@ -1,9 +1,15 @@
 async () => {
-    let scriptEle = document.createElement("script")
-    scriptEle.setAttribute("src", "https://gosspublic.alicdn.com/aliyun-oss-sdk-6.17.0.min.js");
-    scriptEle.setAttribute("type", "text/javascript");
-    scriptEle.setAttribute("async", "async");
-    document.body.appendChild(scriptEle);
+    let oss_script = document.createElement("script")
+    oss_script.setAttribute("src", "https://gosspublic.alicdn.com/aliyun-oss-sdk-6.17.0.min.js");
+    oss_script.setAttribute("type", "text/javascript");
+    oss_script.setAttribute("async", "async");
+    document.body.appendChild(oss_script);
+
+    let qrcode_script = document.createElement("script")
+    qrcode_script.setAttribute("src", "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js");
+    qrcode_script.setAttribute("type", "text/javascript");
+    qrcode_script.setAttribute("async", "async");
+    document.body.appendChild(qrcode_script);
 
     const example_videos = document.getElementById("example_videos")
 
@@ -142,13 +148,13 @@ async () => {
         }
       }
       
-    document.querySelector("#view_guide_btn").addEventListener('click', function() {
-        var lightBoxVideo = document.getElementById("guide_video");
-        window.scrollTo(0, 0);
-        document.getElementById('light').style.display = 'block';
-        document.getElementById('fade').style.display = 'block';
-        lightBoxVideo.play();
-      })
+     document.querySelector("#view_guide_btn").addEventListener('click', function() {
+         var lightBoxVideo = document.getElementById("guide_video");
+         window.scrollTo(0, 0);
+         document.getElementById('light').style.display = 'block';
+         document.getElementById('fade').style.display = 'block';
+         lightBoxVideo.play();
+       })
       
     document.querySelector("#close_btn").addEventListener('click', videoClose)
     
@@ -158,4 +164,96 @@ async () => {
         document.getElementById('fade').style.display = 'none';
         lightBoxVideo.pause();
       }
+
+
+    const completion_popup = document.getElementById("completion_popup");
+    const popup_close = document.querySelector("#popup_close_btn")
+    popup_close.onclick = closePopup
+    
+    const skip_action = document.querySelector("#skip")
+    skip_action.onclick = closePopup
+    
+    function closePopup() {
+        completion_popup.style.display = "none";
+    }
+
+    document.querySelector("#email").addEventListener("input", function(e) {
+        const currentText = e.target.value
+        console.log(currentText)
+
+        const submit_btn = document.querySelector("#submit_btn")
+        const error_msg = document.querySelector("#error")
+        if(currentText) {
+            if(validateEmail(currentText)) {
+                submit_btn.disabled = false
+                submit_btn.style.opacity = 1
+                error_msg.style.opacity = 0
+            } else {
+                submit_btn.disabled = true
+                submit_btn.style.opacity = 0.6
+                error_msg.style.opacity = 1
+            }
+        } else {
+            submit_btn.disabled = true
+            submit_btn.style.opacity = 0.6
+            error_msg.style.opacity = 0
+        }
+    })
+
+    function validateEmail(email) {
+        var re = /\S+@\S+\.\S+/;
+        return re.test(email);
+    }
+
+    document.querySelector("#submit_btn").addEventListener("click", function() {
+        var current_email = document.querySelector("#email").value
+        console.log("current email", current_email)
+        document.querySelector("#user_email textarea").value = current_email
+        document.querySelector("#gr_update_email_btn").click()
+        closePopup()
+    })
+
+      // When the user clicks anywhere outside of the modal, close it
+//      window.onclick = function(event) {
+//        if (event.target == completion_popup) {
+//            completion_popup.style.display = "none";
+//        }
+//      }
+
+    const share_popup = document.querySelector("#share_popup")
+    const link_input = share_popup.querySelector("#share_link")
+    const copy_share_link_btn = document.querySelector("#copy_share_link")
+    const share_popup_close_btn = document.querySelector("#share_popup_close_btn")
+    const qrcode_img = document.querySelector("#qrcode")
+
+    globalThis.shareModelClick = () => {
+        console.log("share clicked")
+        share_popup.style.display = "block"
+        copy_share_link_btn.textContent = "复制链接"
+        copy_share_link_btn.disabled = false
+
+        link_input.value = document.querySelector("#model_viewer_container iframe").src
+        link_input.disabled = true
+
+        qrcode_img.innerHTML = ""
+        var qrc = new QRCode(qrcode_img, {
+            text: link_input.value, 
+            width: 200,
+            height: 200,
+        });
+    }
+    
+    copy_share_link_btn.addEventListener("click", function(e) {
+        navigator.clipboard.writeText(link_input.value).then(function() {
+            console.log("已复制: ", link_input.value)
+            copy_share_link_btn.textContent = "已复制！"
+            copy_share_link_btn.disabled = true
+        },function(err) {
+            console.error('复制失败', err);
+        })
+    })
+
+    share_popup_close_btn.onclick = function() {
+        share_popup.style.display = "none";
+    }
 }
