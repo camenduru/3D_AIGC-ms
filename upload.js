@@ -12,9 +12,11 @@
     const upload_helper_txt = document.querySelector("#upload_helper_txt")
     const user_email_txt = document.querySelector("#user_email")
 
-    const completion_popup = document.querySelector("#completion_popup");
+    const completion_popup = document.querySelector("#completion_popup")
+    const progress_bar = document.querySelector("#progress_bar")
 
     upload_build_btn.disabled = true
+    upload_clear_btn.style.opacity = 0
 
     const file = video_upload_input.files[0]
     const file_name = encodeURIComponent(file.name)
@@ -37,6 +39,7 @@
         progress: (p, cpt, res) => {
             console.log("上传进度", p)
             upload_build_btn.textContent = `上传中...(${(p * 100).toFixed(1)}%)`
+            progress_bar.style.width = `${p*100}%`
         },
         headers: {
             "name": file_name,
@@ -52,13 +55,15 @@
             console.log("上传结果", result)
             if (result.res.statusCode == 200) {
                 upload_clear_btn.click()
+                upload_clear_btn.style.opacity = 1
+                progress_bar.style.width = 0
                 result["success"] = true
                 upload_helper_txt.querySelector("textarea").value = JSON.stringify(result)
                 upload_build_btn.textContent = "上传并生成模型"
                 upload_completion_btn.click()
 
                 //show email notification popup
-                completion_popup.style.display = "none"
+                completion_popup.style.display = "block"
                 const saved_email = user_email_txt.querySelector("textarea").value
                 if (saved_email) {
                     document.querySelector("#email").value = saved_email
@@ -79,11 +84,20 @@
         }).catch(function (err) {
             console.log("上传失败:", err)
             alert("上传失败，请稍后重试。")
+            upload_clear_btn.style.opacity = 1
+            progress_bar.style.width = 0
             upload_helper_txt.querySelector("textarea").value = `{"success": false, "error": ${err}}`
         })
 
         document.querySelector("#email").addEventListener("input", function(e) {
             clearInterval(intervalHandle)
-            document.querySelector("#skip").textContent = "不想留邮箱，1小时后回来查"
+            const saved_email = user_email_txt.querySelector("textarea").value
+            const skip_txt = document.querySelector("#skip")
+            skip_txt.textContent = "不想留邮箱，1小时后回来查看"
+            if (saved_email) {
+                skip_txt.style.display = "none"
+            } else {
+                skip_txt.style.display = "block"
+            }
         })
 }

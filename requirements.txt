@@ -3,4 +3,4 @@ pygltflib~=1.15.6
 transformations~=2022.9.26
 oss2==2.18.1
 alibabacloud-tea-util~=0.3.9
-alibabacloud-xrengine20230313~=1.0.2
+alibabacloud-xrengine20230313~=2.1.0

@@ -5,7 +5,7 @@ from alibabacloud_tea_openapi.models import Config
 from alibabacloud_xrengine20230313.client import Client
 from alibabacloud_xrengine20230313.models import PopCreateObjectProjectRequest, PopListObjectProjectRequest, \
     PopVideoSaveSourceRequest, PopBuildObjectProjectRequest, AuthUserRequest, LoginModelScopeRequest, \
-    PopListObjectCaseRequest #, UpdateUserEmailRequest
+    PopListObjectCaseRequest, UpdateUserEmailRequest
 
 
 # ID [2023-07-12 10:43:36] Triggered fetch_uuid: a28d98c229cc31b26d226bae566cbb0
@@ -24,11 +24,22 @@ def login(client: Client, userid):
     return client.login_model_scope(LoginModelScopeRequest(token=userid, type="MODEL_SCOPE"))
 
 def update_user_email(client: Client, email, jwt):
-    #resp = client.update_user_email(UpdateUserEmailRequest(email, jwt_token=jwt))
-    print("update email:")
-    #return resp
+    resp = client.update_user_email(UpdateUserEmailRequest(email=email, jwt_token=jwt))
+    print("update email:", resp)
+    return resp
 
 def create_project(client: Client, jwt, share):
+    """
+    创建项目
+
+    Args:
+        client (Client): 客户端对象
+        jwt: JWT令牌
+        share (bool): 是否共享项目
+
+    Returns:
+        object: 创建的项目对象
+    """
     request = PopCreateObjectProjectRequest(jwt_token=jwt,
                                             title=f"魔搭项目_{int(time.time())}",
                                             mode="source",
@@ -40,7 +51,16 @@ def create_project(client: Client, jwt, share):
 
 
 def list_projects(client: Client, jwt):
-    # biz_usage = "inverse_rendering",
+    """
+        列出项目
+
+        Args:
+            client (Client): API客户端对象
+            jwt (str): 用户令牌
+
+        Returns:
+            PopListObjectProjectResponse: 列出项目的响应结果
+        """
     request = PopListObjectProjectRequest(jwt_token=jwt,
                                           current=1,
                                           size=5,

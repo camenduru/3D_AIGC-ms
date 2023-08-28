@@ -5,7 +5,7 @@
         <button id="view_guide_btn" class="action_btn">观看拍摄教程</button>
     </div>
     <div style="display: block; width: 2%; height: auto; margin: auto">
-        <img src="https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/arrow.png&View=true">
+        <img id="arrow1">
     </div>
     <div class="step_container">
         <h4 style="line-height: 22px;">2. 选择视频</h4>
@@ -28,16 +28,19 @@
         </div>
     </div>
     <div style="display: block; width: 2%; height: auto; margin: auto">
-        <img src="https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/arrow.png&View=true">
+        <img id="arrow2">
     </div>
     <div class="step_container">
         <h4 style="line-height: 22px;">3. 上传并生成3D模型</h4>
-        <div style="line-height: 24px;" ><input type="checkbox" id="share" name="share"><label for="share" style="padding-left: 4px;">申请展示到官方案例集</label></div>
-        <button id="upload_build_btn" class="action_btn" disabled>上传并生成模型</button>
+        <div style="line-height: 24px;" ><input type="checkbox" id="share_check" name="share_check"><label for="share_check" style="padding-left: 4px;">申请展示到官方案例集</label></div>
+        <div style="position: relative; width: fit-content; margin: auto">
+            <button id="upload_build_btn" class="action_btn" disabled>上传并生成模型</button>
+            <div id="progress_bar" style="position: absolute; left: 0; bottom:6px; width: 0; height: 4px; background-color: #624AFF"></div>
+        </div>
     </div>
 </div>
 <div style="display: flex; margin-top: 6px; width: 100%; opacity: 0.2; justify-content: center;">
-    <img style="height: 30px; " src="https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/double_arrow.png&View=true">
+    <img id="double_arrow" style="height: 30px; ">
 </div>
 <div id="light">
     <video id="guide_video" controls muted src="https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/guide.mp4&View=true"></video>
@@ -63,7 +66,7 @@
             <input type="email" id="email" size="30" required style="height: 40px !important;"/>
             <input id="submit_btn" type="submit" value="提交" style="width: 80px; height: 40px; background: #624AFF; color: white; margin-left: 8px; opacity: 0.6;" disabled>
         </div>
-        <p id="error" style="opacity: 0; color: red;"> 邮箱格式不正确，请检查</p>
+        <p id="error" style="opacity: 0; color: red;"> 邮箱格式不正确，请检查。</p>
         <p id="skip" style="color: #ccc; margin: 12px auto; text-decoration: underline; cursor: pointer; width: fit-content;">不想留邮箱，1小时后回来查看</p>
     </div>
 </div>

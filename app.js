@@ -43,7 +43,7 @@ async () => {
     const select_video_btn = video_upload_steps_container.querySelector("#select_video_btn")
     const clear_btn = video_upload_steps_container.querySelector("#clear_btn")
 
-    const share_checkbox = video_upload_steps_container.querySelector("#share")
+    const share_checkbox = video_upload_steps_container.querySelector("#share_check")
     const upload_build_btn = video_upload_steps_container.querySelector("#upload_build_btn")
 
     video_upload_input.addEventListener("change", function() {
@@ -198,6 +198,11 @@ async () => {
             submit_btn.style.opacity = 0.6
             error_msg.style.opacity = 0
         }
+    })
+
+    const notify_link = document.querySelector("#notify_link")
+    notify_link.addEventListener("click", function() {
+        completion_popup.style.display = "block";
     })
 
     function validateEmail(email) {

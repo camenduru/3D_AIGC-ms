@@ -44,7 +44,7 @@ span {
     transform: translate(0, 10px);
     background-color: #FEFEFE;
     padding: 1rem;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+    box-shadow: 0px 4px 5px 0 rgba(0, 0, 0, 0.4);
     width: auto;
 }
 .popover_content:before {
@@ -293,7 +293,7 @@ span {
     opacity: 0.6 !important;
 }
 
-#share:checked {
+#share_check:checked {
     background-color:#624AFF !important;
 }
 
@@ -416,4 +416,33 @@ a[data-tooltip]:hover:before {
     border-style: solid;
     border-width: 8px 8px 8px 8px;
     border-color: black transparent transparent transparent;
+}
+
+/**media sources**/
+#app_qrcode {
+    content: url("https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/qrcode.jpg&View=true");
+}
+
+#download {
+    content: url("https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/download.png&View=true");
+}
+
+#share {
+    content: url("https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/share.png&View=true");
+}
+
+#build_failed {
+    content: url("https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/close.png&View=true");
+}
+
+#arrow1 {
+    content: url("https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/arrow.png&View=true");
+}
+
+#arrow2 {
+    content: url("https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/arrow.png&View=true");
+}
+
+#double_arrow {
+    content: url("https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/double_arrow.png&View=true");
 }

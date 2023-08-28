@@ -34,8 +34,8 @@ def model_preview_url(url, title):
 
 def model_viewer_iframe(url, title, show_actions: bool):
     model_iframe = f"""
-    {model3d_label_html}
-    <iframe class='model_container' src ='{model_preview_url(url, title)}'></iframe>
+        {model3d_label_html}
+        <iframe class='model_container' src ='{model_preview_url(url, title)}'></iframe>
     """
     if show_actions:
         model_iframe = model3d_actions_html + model_iframe
@@ -127,7 +127,6 @@ def fetch_project_list(jwt_token):
             except IndexError:
                 return ""
 
-        # images = list(map(get_covers, resp.body.data))
         proj_videos = [item for item in list(map(get_covers, resp.body.data)) if item is not None]
         return proj_videos
     except:
@@ -148,7 +147,12 @@ def featured_projects_html_constructor(jwt_token):
                 if not preview_url:
                     return None
                 else:
-                    return f"<a style='display: contents;' href='{model_preview_url(proj.dataset.model_url, proj.title)}' target='_blank'><video class='featured_model_vid' muted preload='auto' onmouseover='this.play()' onmouseout='this.pause()' src='{preview_url}'></video></a>"
+                    return f"""
+                        <a style='display: contents;' href='{model_preview_url(proj.dataset.model_url, proj.title)}' target='_blank'>
+                            <video class='featured_model_vid' style="background-image: url('{proj.dataset.cover_url}'); background-size: contain;" muted preload='auto' onmouseover='this.play()' onmouseout='this.pause()' src='{preview_url}'>
+                            </video>
+                        </a>
+                    """
             except IndexError:
                 return None
         proj_model_htmls = [item for item in list(map(get_model_url, resp.body.data)) if item is not None]
@@ -157,10 +161,12 @@ def featured_projects_html_constructor(jwt_token):
     except:
         raise gr.exceptions.Error("获取数据失败，请刷新重试。")
 
+
 def update_email_btn_click(email_txt, jwt_token):
     print("new email", email_txt)
     print("jwt:", jwt_token)
     update_user_email(client, base64.b64encode(email_txt.encode()).decode("utf-8"), jwt_token)
+
 
 def temp_btn_on_click(model_url_txt):
     print("model_url_txt: ", model_url_txt)
@@ -187,7 +193,7 @@ def gr_on_load(uuid):
         print("login response: ", resp)
         try:
             jwt = resp.body.data.jwt_token
-            email = "" #resp.body.data.email
+            email = resp.body.data.email
             return [jwt_token_txt.update(jwt),
                     usr_email_text.update(email),
                     projects_html.update(value=project_list_html_constructor(jwt)),
@@ -238,7 +244,7 @@ with gr.Blocks(css=css) as demo:
                                             container=False)
             with gr.Column():
                 gr.HTML("<p>模型记录<span style='font-size:11px; color: #9ca3afcc; margin-left:6px;'>保留最近5个记录</span></p>", elem_classes="section_title")
-                temp_btn = gr.Button(elem_id="temp_btn", visible=False)
+                project_helper_btn = gr.Button(elem_id="temp_btn", visible=False)
                 projects_html = gr.HTML(elem_id="projects_container")
 
         # upload steps:
@@ -279,11 +285,13 @@ with gr.Blocks(css=css) as demo:
                     example_videos.style.opacity = 1
                 }
             """)
-        update_email_btn.click(update_email_btn_click, inputs=[usr_email_text, jwt_token_txt], _js="() => [document.querySelector('#user_email textarea').value, document.querySelector('#jwt_token textarea').value]")
-        temp_btn.click(temp_btn_on_click,
-                       inputs=temp_btn,
-                       outputs=[source_video, model_state_container, remote_model_viewer],
-                       _js="() => document.querySelector('.project_vid_container.selected').getAttribute('data-model-url') ")\
+        update_email_btn.click(update_email_btn_click,
+                               inputs=[usr_email_text, jwt_token_txt],
+                               _js="() => [document.querySelector('#user_email textarea').value, document.querySelector('#jwt_token textarea').value]")
+        project_helper_btn.click(temp_btn_on_click,
+                                 inputs=project_helper_btn,
+                                 outputs=[source_video, model_state_container, remote_model_viewer],
+                                 _js="() => document.querySelector('.project_vid_container.selected').getAttribute('data-model-url') ")\
             .then(fn=None,
                   _js="""
                         () => {
@@ -306,7 +314,10 @@ with gr.Blocks(css=css) as demo:
     with gr.Column():
         gr.HTML("<h2 style='text-align:center; margin-top: 20px;'>模型案例</h2>")
         featured_projects_html = gr.HTML(elem_id="featured_projects_container")
-    demo.load(fn=gr_on_load, inputs=uuid_txt, outputs=[jwt_token_txt, usr_email_text, projects_html, featured_projects_html], _js=app_js)\
+    demo.load(fn=gr_on_load,
+              inputs=uuid_txt,
+              outputs=[jwt_token_txt, usr_email_text, projects_html, featured_projects_html],
+              _js=app_js)\
         .then(fn=None,
               _js="""
                 () => {
@@ -314,7 +325,15 @@ with gr.Blocks(css=css) as demo:
                     const first_project_vid = document.querySelector('.project_vid_container')
                     if(first_project_vid) {
                         first_project_vid.click()
-                    } 
+                    }
+                    //show email popup link if needed.
+                    const saved_email = document.querySelector("#user_email textarea").value 
+                    console.log("saved email:", saved_email)
+                    if(saved_email) {
+                        notify_link.style.display = "none"
+                    } else {
+                        notify_link.style.display = "block"
+                    }
                 }
             """)
 
