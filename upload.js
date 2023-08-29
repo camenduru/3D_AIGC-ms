@@ -64,13 +64,22 @@
 
                 //show email notification popup
                 completion_popup.style.display = "block"
+                const error_msg = document.querySelector("#error")
+                error_msg.style.opacity = 0
+
                 const saved_email = user_email_txt.querySelector("textarea").value
+                const submit_btn = document.querySelector("#submit_btn")
                 if (saved_email) {
                     document.querySelector("#email").value = saved_email
                     document.querySelector("#email_hint").textContent = "您已留下邮箱地址，模型构建结果会邮件通知您:"
 
+                    submit_btn.style.opacity = 0.6
+                    submit_btn.disabled = false
+
                     var secs = 5
-                    document.querySelector("#skip").textContent = "5秒后关闭"
+                    const skip_txt = document.querySelector("#skip")
+                    skip_txt.style.display = "block"
+                    skip_txt.textContent = "5秒后关闭"
                     intervalHandle = setInterval(() => {
                         secs = secs - 1
                         document.querySelector("#skip").textContent = `${secs}秒后关闭`
