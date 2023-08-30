@@ -1,16 +1,10 @@
-# 玩偶、永生花、水壶、帆布鞋、手提包
+#玩偶、永生花、水壶、帆布鞋、手提包
 samples = [
     {
         "name": "toy",
         "cover": "resource/cover_4.png",
         "video": "resource/video_4.mp4",
         "model": "//xr-property.oss-cn-hangzhou.aliyuncs.com/dataset/Ds.B7CKIIIJZOAU2/model.xr",
-    },
-    {
-        "name": "flower",
-        "cover": "resource/cover_5.png",
-        "video": "resource/video_5.mp4",
-        "model": "//xr-property.oss-cn-hangzhou.aliyuncs.com/dataset/Ds.B65Z2CYERSYU2/model.xr",
     },
     {
         "name": "kettle",
@@ -29,6 +23,12 @@ samples = [
         "cover": "resource/cover_1.png",
         "video": "resource/video_1.mp4",
         "model": "//xr-property.oss-cn-hangzhou.aliyuncs.com/dataset/Ds.B6ZJRQLMJSYU2/model.xr",
-    }
+    },
+    {
+        "name": "basket",
+        "cover": "resource/cover_5.jpg",
+        "video": "resource/video_5.mp4",
+        "model": "//xr-property.oss-cn-hangzhou.aliyuncs.com/dataset/Ds.B6473MQGRMYU2/model.xr",
+    },
 ]
 
