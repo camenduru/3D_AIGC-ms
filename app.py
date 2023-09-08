@@ -31,7 +31,7 @@ app_post_load_js = Path("app_post_load.js").read_text()
 def model_preview_url(url, title):
     if not url:
         return ""
-    return f"https://market.wapa.taobao.com/app/xr-paas/xr-paas-portal/index.html#/h5-modelviewer?modelUrl={quote(url)}&modelName={quote(title)}&bizUsage=inverse_rendering"
+    return f"https://market.m.taobao.com/app/xr-paas/xr-paas-portal/index.html#/h5-modelviewer?modelUrl={quote(url)}&modelName={quote(title)}&bizUsage=inverse_rendering"
 
 def model_viewer_iframe(url, title, show_actions: bool):
     model_iframe = f"""
