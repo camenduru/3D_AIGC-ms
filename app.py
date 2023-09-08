@@ -26,22 +26,23 @@ model3d_actions_html = Path("htmls/model3d_actions.html").read_text()
 
 app_js = Path("app.js").read_text()
 upload_js = Path("upload.js").read_text()
+app_post_load_js = Path("app_post_load.js").read_text()
 
 def model_preview_url(url, title):
     if not url:
         return ""
-    return f"https://market.m.taobao.com/app/xr-paas/xr-paas-portal/index.html#/h5-modelviewer?modelUrl={quote(url)}&modelName={quote(title)}&bizUsage=inverse_rendering"
+    return f"https://market.wapa.taobao.com/app/xr-paas/xr-paas-portal/index.html#/h5-modelviewer?modelUrl={quote(url)}&modelName={quote(title)}&bizUsage=inverse_rendering"
 
 def model_viewer_iframe(url, title, show_actions: bool):
     model_iframe = f"""
         {model3d_label_html}
-        <iframe class='model_container' src ='{model_preview_url(url, title)}'></iframe>
+        <iframe class='model_container' src ='{model_preview_url(url, title)}' onload='model_iframe_on_load(this)'></iframe>
     """
     if show_actions:
         model_iframe = model3d_actions_html + model_iframe
     return model_iframe
 
-def project_video_constructor(video_url, status, model_url, glb_url):
+def project_video_constructor(project_id, video_url, status, model_url, glb_url):
     if status == "CREATED":
         actual = "空项目"
         color = "white"
@@ -60,7 +61,7 @@ def project_video_constructor(video_url, status, model_url, glb_url):
     display_status = "display: none" if status == "VIEWABLE" else "display: block"
     actual_glb_url = glb_url if status == "VIEWABLE" else ""
     return f"""
-        <div class='project_vid_container' data-model-url='{actual_model_url}' data-glb-url='{actual_glb_url}' data-status='{status}' onclick='project_video_on_click(this)'>
+        <div class='project_vid_container' data-project-id='{project_id}' data-model-url='{actual_model_url}' data-glb-url='{actual_glb_url}' data-status='{status}' onclick='project_video_on_click(this)'>
             <div class='project_status_overlay' style='{display_status}'>
                 <p style='text-align: center; color: {color}; font-size: 16px; margin: 40% 0;'>{actual}</p>
             </div>
@@ -123,7 +124,7 @@ def fetch_project_list(jwt_token):
                             status = "MAKING"
 
                     glb_model_url = proj.dataset.build_result_url.get("glbModel", None)
-                    return project_video_constructor(video_url, status, proj.dataset.model_url, glb_model_url)
+                    return project_video_constructor(proj.id, video_url, status, proj.dataset.model_url, glb_model_url)
             except IndexError:
                 return ""
 
@@ -161,12 +162,10 @@ def featured_projects_html_constructor(jwt_token):
     except:
         raise gr.exceptions.Error("获取数据失败，请刷新重试。")
 
-
 def update_email_btn_click(email_txt, jwt_token):
     print("new email", email_txt)
     print("jwt:", jwt_token)
     update_user_email(client, base64.b64encode(email_txt.encode()).decode("utf-8"), jwt_token)
-
 
 def temp_btn_on_click(model_url_txt):
     print("model_url_txt: ", model_url_txt)
@@ -211,7 +210,7 @@ with gr.Blocks(css=css) as demo:
         video_uploader_steps = gr.HTML(value=video_uploader_steps_html)
         with gr.Row():
             with gr.Column():
-                uuid_txt = gr.Text(label="modelscope_uuid", visible=False)
+                uuid_txt = gr.Text(label="modelscope_uuid", elem_id="uuid", visible=False)
                 jwt_token_txt = gr.Text(label="modelscope_jwt_token", elem_id="jwt_token", visible=False)
                 upload_helper_txt = gr.Text(label="upload_helper", elem_id="upload_helper_txt", visible=False)
                 usr_email_text = gr.Text(elem_id="user_email", visible=False)
@@ -319,22 +318,7 @@ with gr.Blocks(css=css) as demo:
               outputs=[jwt_token_txt, usr_email_text, projects_html, featured_projects_html],
               _js=app_js)\
         .then(fn=None,
-              _js="""
-                () => {
-                    //select the most recent project if any.
-                    const first_project_vid = document.querySelector('.project_vid_container')
-                    if(first_project_vid) {
-                        first_project_vid.click()
-                    }
-                    //show email popup link if needed.
-                    const saved_email = document.querySelector("#user_email textarea").value 
-                    console.log("saved email:", saved_email)
-                    if(saved_email) {
-                        notify_link.style.display = "none"
-                    } else {
-                        notify_link.style.display = "block"
-                    }
-                }
-            """)
+              _js=app_post_load_js)
+
 
 demo.launch()

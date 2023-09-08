@@ -1,4 +1,21 @@
 async () => {
+    const meta = document.createElement('meta');
+    meta.name = "aplus-core"
+    meta.content = "aplus.js";
+    document.head.appendChild(meta);
+
+    //add meta tag for iframe
+    const aplusMeta = document.createElement('meta')
+    aplusMeta.name = "aplus-ifr-pv"
+    aplusMeta.content = "1"
+    document.head.appendChild(aplusMeta)
+
+    //create meta tag
+    const aplusMTag = document.createElement('meta')
+    aplusMTag.name = "aplus-waiting"
+    aplusMTag.content = "MAN"
+    document.head.appendChild(aplusMTag)
+
     let oss_script = document.createElement("script")
     oss_script.setAttribute("src", "https://gosspublic.alicdn.com/aliyun-oss-sdk-6.17.0.min.js");
     oss_script.setAttribute("type", "text/javascript");
@@ -10,6 +27,19 @@ async () => {
     qrcode_script.setAttribute("type", "text/javascript");
     qrcode_script.setAttribute("async", "async");
     document.body.appendChild(qrcode_script);
+
+    (function (w, d, s, q, i) {
+        w[q] = w[q] || [];
+        const f = d.getElementsByTagName(s)[0], j = d.createElement(s);
+        j.async = true;
+        j.id = 'beacon-aplus';
+        // 注意，exparams里的userId=yourUserId需要改成当前登录用户的userId
+        // 用户登录的情况下这个userId一定要埋点！！！否则无法计算精准的UV
+        // const userId = d.querySelector("#modelscope_uuid textarea").value
+        j.setAttribute('exparams', `clog=o&userid=&aplus&sidx=aplusSidx&ckx=aplusCkx`);
+        j.src = "//g.alicdn.com/alilog/mlog/aplus_v2.js";
+        f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'aplus_queue');
 
     const example_videos = document.getElementById("example_videos")
 
@@ -93,9 +123,9 @@ async () => {
 
     globalThis.project_video_on_click = (e) => {
         console.log("project video clicked")
-        var model_url = e.getAttribute("data-model-url")
-        var status = e.getAttribute("data-status")
-        console.log("model url", model_url)
+        const model_url = e.getAttribute("data-model-url");
+        const status = e.getAttribute("data-status");
+        // console.log("model url", model_url)
 
         gallery_items?.forEach(it => { it.classList.remove("selected") })
         document.querySelectorAll(".project_vid_container")?.forEach(it => { it.classList.remove("selected")})
@@ -110,7 +140,7 @@ async () => {
         model_building_container.style.display='none'
         model_placeholder.style.display='none'
 
-        if (status == "VIEWABLE" && model_url) {
+        if (status === "VIEWABLE" && model_url) {
             console.log("display model")
             // model_state_container.classList.add("hidden")
             // model_viewer_container.classList.remove("hidden")
@@ -125,9 +155,9 @@ async () => {
 
             // model_state_container_child.classList.remove("hide")
             
-            if (status == "MAKING_FAILED") {
+            if (status === "MAKING_FAILED") {
                 model_build_failed_container.style.display='flex'
-            } else if (status == "MAKING") {
+            } else if (status === "MAKING") {
                 model_building_container.style.display='flex'
             } else {
                 model_placeholder.style.display='flex'
@@ -142,14 +172,14 @@ async () => {
 
     //guide video display
     window.document.onkeydown = function(e) {
-        console.log(e)
-        if (e.key == "Escape") {
+        // console.log(e)
+        if (e.key === "Escape") {
             videoClose()
         }
       }
       
      document.querySelector("#view_guide_btn").addEventListener('click', function() {
-         var lightBoxVideo = document.getElementById("guide_video");
+         const lightBoxVideo = document.getElementById("guide_video");
          window.scrollTo(0, 0);
          document.getElementById('light').style.display = 'block';
          document.getElementById('fade').style.display = 'block';
@@ -159,7 +189,7 @@ async () => {
     document.querySelector("#close_btn").addEventListener('click', videoClose)
     
     function videoClose() {
-        var lightBoxVideo = document.getElementById("guide_video");
+        const lightBoxVideo = document.getElementById("guide_video");
         document.getElementById('light').style.display = 'none';
         document.getElementById('fade').style.display = 'none';
         lightBoxVideo.pause();
@@ -206,13 +236,13 @@ async () => {
     })
 
     function validateEmail(email) {
-        var re = /\S+@\S+\.\S+/;
+        const re = /\S+@\S+\.\S+/;
         return re.test(email);
     }
 
     document.querySelector("#submit_btn").addEventListener("click", function() {
-        var current_email = document.querySelector("#email").value
-        console.log("current email", current_email)
+        const current_email = document.querySelector("#email").value;
+        // console.log("current email", current_email)
         document.querySelector("#user_email textarea").value = current_email
         document.querySelector("#gr_update_email_btn").click()
         closePopup()
@@ -224,41 +254,4 @@ async () => {
 //            completion_popup.style.display = "none";
 //        }
 //      }
-
-    const share_popup = document.querySelector("#share_popup")
-    const link_input = share_popup.querySelector("#share_link")
-    const copy_share_link_btn = document.querySelector("#copy_share_link")
-    const share_popup_close_btn = document.querySelector("#share_popup_close_btn")
-    const qrcode_img = document.querySelector("#qrcode")
-
-    globalThis.shareModelClick = () => {
-        console.log("share clicked")
-        share_popup.style.display = "block"
-        copy_share_link_btn.textContent = "复制链接"
-        copy_share_link_btn.disabled = false
-
-        link_input.value = document.querySelector("#model_viewer_container iframe").src
-        link_input.disabled = true
-
-        qrcode_img.innerHTML = ""
-        var qrc = new QRCode(qrcode_img, {
-            text: link_input.value, 
-            width: 200,
-            height: 200,
-        });
-    }
-    
-    copy_share_link_btn.addEventListener("click", function(e) {
-        navigator.clipboard.writeText(link_input.value).then(function() {
-            console.log("已复制: ", link_input.value)
-            copy_share_link_btn.textContent = "已复制！"
-            copy_share_link_btn.disabled = true
-        },function(err) {
-            console.error('复制失败', err);
-        })
-    })
-
-    share_popup_close_btn.onclick = function() {
-        share_popup.style.display = "none";
-    }
 }
