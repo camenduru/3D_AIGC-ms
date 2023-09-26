@@ -424,7 +424,7 @@ a[data-tooltip]:hover:before {
 }
 
 #feedback_qrcode {
-    content: url("https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/feedback_qrcode.jpg&View=true");
+    content: url("https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/feedback_qrcode.JPG&View=true");
 }
 
 #download {
