@@ -15,7 +15,7 @@ video {
 .download {
     visibility: hidden;
 }
-.tab-nav {
+.tab-nav button:last-child, .tab-nav button:nth-last-child(2) {
     pointer-events:none;
 }
 

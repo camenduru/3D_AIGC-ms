@@ -8,10 +8,10 @@ import gradio as gr
 
 from api_manager import setup, list_projects, login, list_featured_projects, create_project_sts, action_post_upload, update_user_email
 from samples import samples
-
-access_key_id = base64.b64decode(os.getenv("Var1", "")).decode("utf-8")
-access_key_secret = base64.b64decode(os.getenv("Var2", "")).decode("utf-8")
-api_endpoint = "xrengine.cn-hangzhou.aliyuncs.com"
+from script import vite_js
+import datetime
+from config.env import access_key_id, access_key_secret, api_endpoint
+from api.text2obj.utils import t2m_doTask, t2m_htmlloaded, t2m_refreshModelsStatus, t2m_updateOutput, t2m_loadHistoryList
 
 client = setup(access_key_id, access_key_secret, api_endpoint)
 
@@ -196,12 +196,23 @@ def gr_on_load(uuid):
             return [jwt_token_txt.update(jwt),
                     usr_email_text.update(email),
                     projects_html.update(value=project_list_html_constructor(jwt)),
-                    featured_projects_html.update(value=featured_projects_html_constructor(jwt))
+                    featured_projects_html.update(value=featured_projects_html_constructor(jwt)),
+                    t2m_loadHistoryList(jwt)
                     ]
         except (NameError, AttributeError):
             raise gr.exceptions.Error("用户登录失败，请刷新重试。")
     else:
         raise gr.exceptions.Error("用户登录失败，请刷新重试。")
+
+def update_usr_login(userInfo):
+    userInfo = json.loads(userInfo)
+    return [
+        jwt_token_txt.update(userInfo['jwtToken']),
+        usr_email_text.update(userInfo['email'])
+    ]
+    
+def update_time():
+    return str(datetime.datetime.now().time())
 
 
 with gr.Blocks(css=css) as demo:
@@ -218,6 +229,8 @@ with gr.Blocks(css=css) as demo:
                 share_checkbox = gr.Checkbox(False, label="同意分享至官方案例集", container=False, elem_id="gr_share_checkbox", visible=False)
                 upload_helper_btn = gr.Button("生成模型", elem_id="upload_helper_btn", visible=False)
                 upload_completion_btn = gr.Button(elem_id="upload_completion_btn", visible=False)
+                gr_login_button = gr.Button(elem_id="gr_login_button", visible=False)
+                gr_login_button.click(update_usr_login, inputs=jwt_token_txt, outputs=[jwt_token_txt, usr_email_text], _js="""() => [window.getUserInfo()]""")
 
                 source_video = gr.Video(label="源视频",
                                         height=500,
@@ -245,6 +258,9 @@ with gr.Blocks(css=css) as demo:
                 gr.HTML("<p>模型记录<span style='font-size:11px; color: #9ca3afcc; margin-left:6px;'>保留最近5个记录</span></p>", elem_classes="section_title")
                 project_helper_btn = gr.Button(elem_id="temp_btn", visible=False)
                 projects_html = gr.HTML(elem_id="projects_container")
+        with gr.Column():
+            gr.HTML("<h2 style='text-align:center; margin-top: 20px;'>模型案例</h2>")
+            featured_projects_html = gr.HTML(elem_id="featured_projects_container")
 
         # upload steps:
         # fn 1. disable upload button, reset model_state_container, remote_model_viewer
@@ -304,21 +320,32 @@ with gr.Blocks(css=css) as demo:
                             download_btn?.setAttribute("href", glb_url) 
                         }
                   """)
+    with gr.Tab("文本生成", elem_id="t2m_tab"):
+        t2m_expression = gr.HTML("""<script id="text2objexpression">""" + json.dumps({}) + """</script>""", visible=False)
+        t2m_input = gr.HTML(elem_id="text2obj")
+        t2m_button = gr.Button(elem_id="text2obj-button-hidden", visible=False)
+        t2m_stats = gr.State(value={"ids": {}, "details": {}})
+        t2m_output = gr.HTML("""<script id="text2objoutputhtml">""" + json.dumps({"ids": {}, "details": {}}) + """</script>""", visible=False)
+        t2m_json = gr.JSON(visible=False)
+        t2m_json.change(t2m_updateOutput, inputs=[t2m_json], outputs=[t2m_output])
+        t2m_ticker = gr.Label(update_time, visible=False, every=1)
+        t2m_ticker.change(t2m_refreshModelsStatus, inputs=[t2m_input, t2m_stats], outputs=[t2m_stats, t2m_json], _js='''(i, s) => [window.getText2ObjMakingList(), s]''')
+
+        t2m_button.click(t2m_doTask, _js='''(a, b, j) => [window.getText2ObjData(), b, j]''', inputs=[t2m_input, t2m_stats, jwt_token_txt], outputs=[t2m_stats, t2m_json])
+        t2m_js = vite_js()
     with gr.Tab("多图生成 (敬请期待)"):
         gr.Markdown("## <center>Coming soon!</center>")
     with gr.Tab("单图生成 (敬请期待)"):
         gr.Markdown("## <center>Coming soon!</center>")
-    with gr.Tab("文本生成 (敬请期待)"):
-        gr.Markdown("## <center>Coming soon!</center>")
-    with gr.Column():
-        gr.HTML("<h2 style='text-align:center; margin-top: 20px;'>模型案例</h2>")
-        featured_projects_html = gr.HTML(elem_id="featured_projects_container")
+    # with gr.Tab("文本生成 (敬请期待)"):
+    #     gr.Markdown("## <center>Coming soon!</center>")
     demo.load(fn=gr_on_load,
               inputs=uuid_txt,
-              outputs=[jwt_token_txt, usr_email_text, projects_html, featured_projects_html],
+              outputs=[jwt_token_txt, usr_email_text, projects_html, featured_projects_html, t2m_expression],
               _js=app_js)\
         .then(fn=None,
               _js=app_post_load_js)
+    demo.load(t2m_htmlloaded, _js=t2m_js, inputs=None, outputs=None)
 
-
+demo.queue()
 demo.launch()
