@@ -28,6 +28,20 @@ async () => {
     qrcode_script.setAttribute("async", "async");
     document.body.appendChild(qrcode_script);
 
+    !(function (c, b, d, a) {
+        c[a] || (c[a] = {});
+        c[a].config =
+            {
+                pid: "i5mpwy1r19@4516e226a10f094",
+                appType: "web",
+                imgUrl: "https://arms-retcode.aliyuncs.com/r.png?",
+                sendResource: true,
+                enableLinkTrace: true,
+                behavior: true
+            };
+        with (b) with (body) with (insertBefore(createElement("script"), firstChild)) setAttribute("crossorigin", "", src = d)
+    })(window, document, "https://sdk.rum.aliyuncs.com/v1/bl.js", "__bl");
+
     (function (w, d, s, q, i) {
         w[q] = w[q] || [];
         const f = d.getElementsByTagName(s)[0], j = d.createElement(s);
