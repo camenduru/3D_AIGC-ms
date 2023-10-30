@@ -39,7 +39,9 @@
         });
 
         //使用addBehavior接口上报用户点击事件
-        _bl.addBehavior({
+        let bl = window.__bl || [];
+        // console.log("bl", bl)
+        bl.addBehavior({
             data:{
                 name: eventName.replace("/ms_3d_obj.", ""),
                 message: stringifyObject(eventParams)
