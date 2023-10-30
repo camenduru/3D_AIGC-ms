@@ -42,7 +42,7 @@ def model_viewer_iframe(url, title, show_actions: bool):
         model_iframe = model3d_actions_html + model_iframe
     return model_iframe
 
-def project_video_constructor(project_id, video_url, status, model_url, glb_url):
+def project_video_constructor(project_id, video_url, video_cover_url, status, model_url, glb_url):
     if status == "CREATED":
         actual = "空项目"
         color = "white"
@@ -60,12 +60,13 @@ def project_video_constructor(project_id, video_url, status, model_url, glb_url)
     full_video_url = f"https:{video_url}"
     display_status = "display: none" if status == "VIEWABLE" else "display: block"
     actual_glb_url = glb_url if status == "VIEWABLE" else ""
+    #<video class='project_vid' muted preload='auto' onmouseover='this.play()' onmouseout='this.pause()' src='{full_video_url}'></video>
     return f"""
         <div class='project_vid_container' data-project-id='{project_id}' data-model-url='{actual_model_url}' data-glb-url='{actual_glb_url}' data-status='{status}' onclick='project_video_on_click(this)'>
             <div class='project_status_overlay' style='{display_status}'>
                 <p style='text-align: center; color: {color}; font-size: 16px; margin: 40% 0;'>{actual}</p>
             </div>
-            <video class='project_vid' muted preload='auto' onmouseover='this.play()' onmouseout='this.pause()' src='{full_video_url}'></video>
+            <img class='project_vid' src='{video_cover_url}'></img>
         </div>
     """
 
@@ -112,6 +113,7 @@ def fetch_project_list(jwt_token):
         def get_covers(proj):
             try:
                 video_url = proj.source.source_files[0].url
+                video_cover_url = proj.source.source_files[0].cover_url
                 print("video url", video_url)
                 if not video_url:
                     return ""
@@ -124,7 +126,7 @@ def fetch_project_list(jwt_token):
                             status = "MAKING"
 
                     glb_model_url = proj.dataset.build_result_url.get("glbModel", None)
-                    return project_video_constructor(proj.id, video_url, status, proj.dataset.model_url, glb_model_url)
+                    return project_video_constructor(proj.id, video_url, video_cover_url, status, proj.dataset.model_url, glb_model_url)
             except IndexError:
                 return ""
 
