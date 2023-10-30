@@ -62,7 +62,7 @@ def project_video_constructor(project_id, video_url, video_cover_url, status, mo
     actual_glb_url = glb_url if status == "VIEWABLE" else ""
     #<video class='project_vid' muted preload='auto' onmouseover='this.play()' onmouseout='this.pause()' src='{full_video_url}'></video>
     return f"""
-        <div class='project_vid_container' data-project-id='{project_id}' data-model-url='{actual_model_url}' data-glb-url='{actual_glb_url}' data-status='{status}' onclick='project_video_on_click(this)'>
+        <div class='project_vid_container' data-project-id='{project_id}' data-video-url='{full_video_url}' data-model-url='{actual_model_url}' data-glb-url='{actual_glb_url}' data-status='{status}' onclick='project_video_on_click(this)'>
             <div class='project_status_overlay' style='{display_status}'>
                 <p style='text-align: center; color: {color}; font-size: 16px; margin: 40% 0;'>{actual}</p>
             </div>

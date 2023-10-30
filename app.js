@@ -125,6 +125,7 @@ async () => {
         console.log("project video clicked")
         const model_url = e.getAttribute("data-model-url");
         const status = e.getAttribute("data-status");
+        const video_url = e.getAttribute("data-video-url");
         // console.log("model url", model_url)
 
         gallery_items?.forEach(it => { it.classList.remove("selected") })
@@ -165,7 +166,7 @@ async () => {
         }
 
         const temp_btn = document.querySelector("#temp_btn")
-        temp_btn.textContent = e.querySelector("video").src
+        temp_btn.textContent = video_url
         temp_btn.click()
     }
 
