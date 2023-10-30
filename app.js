@@ -37,7 +37,8 @@ async () => {
                 imgUrl: "https://arms-retcode.aliyuncs.com/r.png?",
                 sendResource: true,
                 enableLinkTrace: true,
-                behavior: true
+                behavior: true,
+                enableSPA: true
             };
         with (b) with (body) with (insertBefore(createElement("script"), firstChild)) setAttribute("crossorigin", "", src = d)
     })(window, document, "https://sdk.rum.aliyuncs.com/v1/bl.js", "__bl");
