@@ -71,19 +71,28 @@ def queryText2ObjModelsDetail(ids):
     return None
 
 
-def queryHistoryProjectList(jwt):
+def queryHistoryProjectList(jwt, current, size):
   try:
-    result = xr_client.pop_list_object_generation_project(PopListObjectGenerationProjectRequest().from_map({"JwtToken": jwt, "Current": 1, "Size": 100})).to_map()
+    result = xr_client.pop_list_object_generation_project(PopListObjectGenerationProjectRequest().from_map({"JwtToken": jwt, "Current": current, "Size": size})).to_map()
     result = transformResponse(result)
-    print('[queryHistoryProjectList] result:', result)
+    print(f'[TEXT2OBJ_queryHistoryProjectList] result: {result}')
     if (result['statusCode'] == 200 and result['body']['success'] == True):
-      return result['body']['data']
+      return {
+        'total': result['body']['total'],
+        'list': result['body']['data']
+      }
     else:
-      print('[TEXT2OBJ_queryHistoryProjectList] error:', result)
-      return []
+      print(f'[TEXT2OBJ_queryHistoryProjectList] error: {result}',)
+      return {
+        'total': result['body']['total'],
+        'list': []
+      }
   except Exception as e:
-    print('[TEXT2OBJ_queryHistoryProjectList] error:', e)
-    return []
+    print(f'[TEXT2OBJ_queryHistoryProjectList] error: {e}')
+    return {
+      'total': 0,
+      'list': []
+    }
 
 
 def is_json(myjson):

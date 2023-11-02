@@ -198,8 +198,7 @@ def gr_on_load(uuid):
             return [jwt_token_txt.update(jwt),
                     usr_email_text.update(email),
                     projects_html.update(value=project_list_html_constructor(jwt)),
-                    featured_projects_html.update(value=featured_projects_html_constructor(jwt)),
-                    t2m_loadHistoryList(jwt)
+                    featured_projects_html.update(value=featured_projects_html_constructor(jwt))
                     ]
         except (NameError, AttributeError):
             raise gr.exceptions.Error("用户登录失败，请刷新重试。")
@@ -335,6 +334,9 @@ with gr.Blocks(css=css) as demo:
 
         t2m_button.click(t2m_doTask, _js='''(a, b, j) => [window.getText2ObjData(), b, j]''', inputs=[t2m_input, t2m_stats, jwt_token_txt], outputs=[t2m_stats, t2m_json])
         t2m_js = vite_js()
+
+        t2m_load_history_button = gr.Button(elem_id='text2obj-button-load-history', visible=False)
+        t2m_load_history_button.click(t2m_loadHistoryList, inputs=[jwt_token_txt, t2m_stats, t2m_input], outputs=t2m_expression, _js='''(j, s, i) => [j, s, window.getText2ObjLoadHistoryParams()]''')
     with gr.Tab("多图生成 (敬请期待)"):
         gr.Markdown("## <center>Coming soon!</center>")
     with gr.Tab("单图生成 (敬请期待)"):
@@ -343,7 +345,7 @@ with gr.Blocks(css=css) as demo:
     #     gr.Markdown("## <center>Coming soon!</center>")
     demo.load(fn=gr_on_load,
               inputs=uuid_txt,
-              outputs=[jwt_token_txt, usr_email_text, projects_html, featured_projects_html, t2m_expression],
+              outputs=[jwt_token_txt, usr_email_text, projects_html, featured_projects_html],
               _js=app_js)\
         .then(fn=None,
               _js=app_post_load_js)

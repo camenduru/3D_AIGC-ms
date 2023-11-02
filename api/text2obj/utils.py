@@ -25,9 +25,18 @@ def t2m_htmlloaded():
     return None
 
 # 获取历史记录列表
-def t2m_loadHistoryList(jwt):
-    result = queryHistoryProjectList(jwt)
-    return ["""<script id="text2objexpression">""" + json.dumps({"historyList": result}) + """</script>"""]
+def t2m_loadHistoryList(jwt, state, params):
+    params = json.loads(params)
+    current = params['current']
+    size = params['size']
+    result = queryHistoryProjectList(jwt, current, size)
+    state['history'] = {
+        'current': current,
+        'total': result['total'],
+        'list': result['list']
+    }
+    outputs = ["""<script id="text2objexpression">""" + json.dumps({"historyList": state['history']}) + """</script>"""]
+    return outputs
 
 # 轮询生成中项目的生成状态
 async def t2m_refreshModelsStatus(list, states):
