@@ -236,7 +236,7 @@ with gr.Blocks(css=css) as demo:
                 source_video = gr.Video(label="源视频",
                                         height=500,
                                         interactive=False,
-                                        autoplay=True,
+                                        autoplay=False,
                                         elem_id="video_input")
             with gr.Column():
                 model_state_container = gr.HTML(label="模型结果",
