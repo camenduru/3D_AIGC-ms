@@ -38,15 +38,16 @@
             ]
         });
 
-        //使用addBehavior接口上报用户点击事件
-        let bl = window.__bl || [];
-        // console.log("bl", bl)
-        bl.addBehavior({
-            data:{
-                name: eventName.replace("/ms_3d_obj.", ""),
-                message: stringifyObject(eventParams)
-            },
-        })
+        //ARMS 平台事件埋点
+        let b = window.__bl || [];
+         b.event({
+             key: eventName, //事件key，必填
+             // success: false, //事件成功与否，非必填，默认true
+             // time: 100, //事件耗时ms，非必填
+             c1: 'CLK', //自定义字段c1，非必填
+             c2: stringifyObject(eventParams), //自定义字段c2，非必填
+             // c3: 'xxx', //自定义字段c3，非必填
+         });
     };
 
     /**
