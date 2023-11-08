@@ -314,6 +314,7 @@ with gr.Blocks(css=css) as demo:
                             const source_video = document.querySelector("#video_input video")
                             if(source_video) {
                                 source_video.src = document.querySelector('#temp_btn').textContent
+                                source_video.muted = true
                                 source_video.play()
                             }
                             const glb_url = document.querySelector(".project_vid_container.selected").getAttribute("data-glb-url")
