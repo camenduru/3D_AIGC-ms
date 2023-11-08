@@ -207,7 +207,7 @@ span {
     /* box-shadow: 2px 2px 4px 0px #ccc; */
 }
 
-.gradio-container-3-35-2 .prose :last-child.featured_model_vid {
+.prose :last-child.featured_model_vid {
     margin-bottom: 2% !important;
 }
 
@@ -284,7 +284,7 @@ span {
     cursor: pointer;
 }
 
-.gradio-container-3-35-2 .prose :last-child .action_btn {
+.prose :last-child .action_btn {
     margin-bottom: 6px !important;
 }
 
