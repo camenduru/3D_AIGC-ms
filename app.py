@@ -225,7 +225,7 @@ def search_input_changed(radio, image, txt):
         ]
     else:
         return [
-            search_btn.update(interactive=txt),
+            search_btn.update(interactive=bool(txt.strip())),
             search_error_label.update(visible=False)
         ]
 
