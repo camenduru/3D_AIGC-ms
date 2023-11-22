@@ -1,0 +1,45 @@
+<div class="tab">
+    <button class="tab-item" onclick="tab_item_click(this, 0)">高精模型</button>
+    <button class="tab-item active" onclick="tab_item_click(this, 1)">快速模型</button>
+</div>
+<div id="hd_model_result" class="tab-content" style="display: none">
+    <div id="hd_model_building" class="model_container" style="border-top: none">
+        <img style="width: 80px"
+             src="https://img.alicdn.com/imgextra/i4/O1CN01kpkVcX1wSCO362MH4_!!6000000006306-1-tps-805-805.gif"
+             alt="loading...">
+        <h4 style="text-align:center;">高精模型生成中...</h4>
+        <p style="text-align:center">大概需要8个小时，请留意邮件或稍后查看</p>
+    </div>
+    <div id="hd_model_failed" class="model_container" style="display: none">
+        <img id="build_failed" style="width: 32px;">
+        <h3 style="text-align:center; color: #FF808B">生成失败</h3>
+        <p style="text-align:center;">物品3D模型构建失败，请按指引重新拍摄视频并上传</p>
+    </div>
+<!--    <div id="hd_model_loading"-->
+<!--         style="display: none; position: absolute; top: 45%; width: 100%; color: black; font-size: 16px; text-align: center">-->
+<!--        <img style="width: 60px; margin: 0 auto"-->
+<!--             src="https://img.alicdn.com/imgextra/i4/O1CN01kpkVcX1wSCO362MH4_!!6000000006306-1-tps-805-805.gif"-->
+<!--             alt="loading...">-->
+<!--        <p>模型构建成功，获取中...</p>-->
+<!--    </div>-->
+    <iframe id="hd_model_viewer" class='model_container model_viewer' style="display: none"></iframe>
+    <div id="hd_model_actions">
+        <a id="hd_download_link" href="" data-tooltip="下载模型" onclick="downloadHDModelLinkClick()">
+            <img class="action_img" id="hd_download">
+        </a>
+        <a id="hd_share_action" data-tooltip="分享" onclick="shareHDModelClick()">
+            <img class="action_img" id="hd_share">
+        </a>
+    </div>
+</div>
+<div id="sd_model_result" class="tab-content">
+    <iframe class='model_container model_viewer' onload='model_iframe_on_load(this)'></iframe>
+    <div id="sd_model_actions">
+        <a id="sd_download_link" href="" data-tooltip="下载模型" onclick="downloadSDModelLinkClick()">
+            <img class="action_img" id="sd_download">
+        </a>
+        <a id="sd_share_action" data-tooltip="分享" onclick="shareSDModelClick()">
+            <img class="action_img" id="sd_share">
+        </a>
+    </div>
+</div>

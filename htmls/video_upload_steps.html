@@ -43,7 +43,7 @@
     <img id="double_arrow" style="height: 30px; ">
 </div>
 <div id="light">
-    <video id="guide_video" controls muted src="https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/guide.mp4&View=true"></video>
+    <video id="guide_video" controls muted src="https://modelscope.cn/api/v1/studio/ggmotest/gg_xr_test/repo?Revision=master&FilePath=resource/guide.mp4&View=true"></video>
     <button id="close_btn" style="position:absolute; top: 0; right: -32px; width: 24px; padding: 2px; height: 24px; border: 1px solid #e5e7eb; background: white; z-index: 1003;">
         <svg width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg"
              xml:space="preserve" stroke="currentColor"
@@ -68,19 +68,5 @@
         </div>
         <p id="error" style="opacity: 0; color: red;"> 邮箱格式不正确，请检查。</p>
         <p id="skip" style="color: #ccc; margin: 12px auto; text-decoration: underline; cursor: pointer; width: fit-content;">不想留邮箱，1小时后回来查看</p>
-    </div>
-</div>
-
-<div id="share_popup" class="modal">
-    <div class="modal-content">
-        <span id="share_popup_close_btn" class="close">&times;</span>
-        <h3 style="margin: 0">分享模型</h3>
-        <div style="height: 1px; width: 100%; background: #cccccc80; margin: 18px 0;"></div>
-        <div style="display: flex; justify-content: center; gap: 8px">
-            <label for="share_link" style="margin: auto 0;">分享链接:</label>
-            <input type="url" id="share_link" required style="height: 32px !important; min-width: 55%;"/>
-            <button id="copy_share_link" style="width: 80px; height: 32px; background: #624AFF; color: white;" >复制链接</button>
-        </div>
-        <div id="qrcode" style="height: 200px; width: 200px; margin: 16px auto;" ></div>
     </div>
 </div>

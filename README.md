@@ -1,4 +1,4 @@
----
+
 # 详细文档见https://modelscope.cn/docs/%E5%88%9B%E7%A9%BA%E9%97%B4%E5%8D%A1%E7%89%87
 domain: #领域：cv/nlp/audio/multi-modal/AutoML
 # - cv
@@ -28,7 +28,13 @@ deployspec: #部署配置，默认上限GPU4核、内存8GB、无GPU、单实例
   instance: 1
 license: Apache License 2.0
 ---
-#### Clone with HTTP
-```bash
- git clone https://www.modelscope.cn/studios/ggmotest/gg_xr_test.git
-```
+
+## Remote管理
+- origin (Aone代码): http://gitlab.alibaba-inc.com/xr-paas/modelscope_3d_objs.git
+- test （创空间测试）:  https://www.modelscope.cn/studios/ggmotest/gg_xr_test.git  (push only，no pull)
+- release (创空间发布): https://www.modelscope.cn/studios/Damo_XR_Lab/3D_AIGC.git  (push only，no pull)
+
+Note:
+1. 开发代码推到aone origin, 分支合并到master
+2. 开发测试完成, 合并到test分支，打包后后推到test 创空间测试
+3. 测试完成，合并到release分支，打包后后推到release创空间发布。

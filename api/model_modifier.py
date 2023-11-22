@@ -22,7 +22,7 @@ def transform_model(model_name):
             mat.extensions["KHR_materials_unlit"] = {}
         node_index = gltf.scenes[gltf.scene].nodes[0]
         root = gltf.nodes[node_index]
-        quat = transformations.quaternion_from_euler(-math.pi/2, math.pi/2, 0, axes="sxyz")  # output is w, x, y, z
+        quat = transformations.quaternion_from_euler(-math.pi / 2, math.pi / 2, 0, axes="sxyz")  # output is w, x, y, z
         root.rotation = (quat[1], quat[2], quat[3], quat[0])  # gltf quaternion is x, y, z, w
         gltf.convert_buffers(BufferFormat.DATAURI)
         gltf.save(gltf_path)

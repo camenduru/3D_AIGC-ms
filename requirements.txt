@@ -3,6 +3,7 @@ pygltflib~=1.15.6
 transformations~=2022.9.26
 oss2==2.18.1
 alibabacloud-tea-util~=0.3.11
--i https://pypi.org/simple
-alibabacloud-xrengine20230313~=2.4.0
 beautifulsoup4~=4.12.2
+requests~=2.31.0
+-i https://pypi.org/simple
+alibabacloud-xrengine20230313~=2.6.0
