@@ -1,0 +1,4 @@
+__pycache__
+node_modules
+/cypress/e2e/*.swp
+config/env_list.json
