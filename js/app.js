@@ -28,22 +28,27 @@ async () => {
     qrcode_script.setAttribute("async", "async");
     document.body.appendChild(qrcode_script);
 
-    !(function (c, b, d, a) {
-        c[a] || (c[a] = {});
-        c[a].config =
-            {
-                pid: "i5mpwy1r19@4516e226a10f094",
-                appType: "web",
-                imgUrl: "https://arms-retcode.aliyuncs.com/r.png?",
-                sendResource: true,
-                enableLinkTrace: true,
-                behavior: true,
-                enableSPA: true
-            };
-        with (b) with (body) with (insertBefore(createElement("script"), firstChild)) setAttribute("crossorigin", "", src = d)
-    })(window, document, "https://sdk.rum.aliyuncs.com/v1/bl.js", "__bl");
+    const path = window.parent.location.pathname
+    const is_prod =  (path.indexOf('3D_AIGC') !== -1) //线上创空间名字为3D_AIGC
 
-    (function (w, d, s, q, i) {
+    if (is_prod) {
+        !(function (c, b, d, a) {
+            c[a] || (c[a] = {});
+            c[a].config =
+                {
+                    pid: "i5mpwy1r19@4516e226a10f094",
+                    appType: "web",
+                    imgUrl: "https://arms-retcode.aliyuncs.com/r.png?",
+                    sendResource: true,
+                    enableLinkTrace: true,
+                    behavior: true,
+                    enableSPA: true
+                };
+            with (b) with (body) with (insertBefore(createElement("script"), firstChild)) setAttribute("crossorigin", "", src = d)
+        })(window, document, "https://sdk.rum.aliyuncs.com/v1/bl.js", "__bl");
+    }
+
+    (function (w, d, s, q) {
         w[q] = w[q] || [];
         const f = d.getElementsByTagName(s)[0], j = d.createElement(s);
         j.async = true;
@@ -58,18 +63,18 @@ async () => {
 
     const example_videos = document.getElementById("example_videos")
 
-    const model_state_container = document.getElementById("model_state_container")
+    // const model_state_container = document.getElementById("model_state_container")
     const model_build_failed_container = document.getElementById("model_build_failed_container")
     const model_building_container = document.getElementById("model_building_container")
     const model_placeholder = document.getElementById("model_placeholder")
-    
+
     model_build_failed_container.style.display='none'
     model_building_container.style.display='none'
     model_placeholder.style.display='flex'
 
     const gallery_items = example_videos.querySelectorAll(".gallery-item")
     gallery_items?.forEach(item => {
-        item.addEventListener("click", function(e) {
+        item.addEventListener("click", function() {
             console.log("video clicked")
             gallery_items.forEach(e => { e.classList.remove("selected") })
             document.querySelectorAll(".project_vid_container")?.forEach(it => { it.classList.remove("selected")})
@@ -127,7 +132,7 @@ async () => {
         gr_checkbox.click()
      })
 
-    upload_build_btn.addEventListener("click", function(e) {
+    upload_build_btn.addEventListener("click", function() {
         model_build_failed_container.style.display='none'
         model_building_container.style.display='none'
         model_placeholder.style.display='flex'
@@ -140,17 +145,16 @@ async () => {
         console.log("project video clicked")
         const model_url = e.getAttribute("data-model-url");
         const status = e.getAttribute("data-status");
-        const video_url = e.getAttribute("data-video-url");
         // console.log("model url", model_url)
 
         gallery_items?.forEach(it => { it.classList.remove("selected") })
         document.querySelectorAll(".project_vid_container")?.forEach(it => { it.classList.remove("selected")})
         e.classList.add("selected")
 
-        const model_viewer_container = document.querySelector("#model_viewer_container")
-        const model_viewer_container_child = model_viewer_container.querySelector("div.prose.svelte-1ybaih5")
+        // const model_viewer_container = document.querySelector("#model_viewer_container")
+        // const model_viewer_container_child = model_viewer_container.querySelector("div.prose.svelte-1ybaih5")
         
-        const model_state_container_child = model_state_container.querySelector("div.prose.svelte-1ybaih5")
+        // const model_state_container_child = model_state_container.querySelector("div.prose.svelte-1ybaih5")
 
         model_build_failed_container.style.display='none'
         model_building_container.style.display='none'
@@ -181,7 +185,7 @@ async () => {
         }
 
         const temp_btn = document.querySelector("#temp_btn")
-        temp_btn.textContent = video_url
+        temp_btn.textContent = e.querySelector(".project_vid").getAttribute('video-src')
         temp_btn.click()
     }
 
@@ -257,17 +261,63 @@ async () => {
     }
 
     document.querySelector("#submit_btn").addEventListener("click", function() {
-        const current_email = document.querySelector("#email").value;
         // console.log("current email", current_email)
-        document.querySelector("#user_email textarea").value = current_email
+        document.querySelector("#user_email textarea").value = document.querySelector("#email").value
         document.querySelector("#gr_update_email_btn").click()
         closePopup()
     })
 
-      // When the user clicks anywhere outside of the modal, close it
+      // When the user clicks anywhere outside the modal, close it
 //      window.onclick = function(event) {
 //        if (event.target == completion_popup) {
 //            completion_popup.style.display = "none";
 //        }
 //      }
+
+    function reset_image_selector_placeholder() {
+        console.log("reset image placeholder")
+        const image_selector = document.querySelector("#image_selector")
+        image_selector.querySelector(".image-container .wrap").innerHTML =
+            `
+            <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-image" style="margin: 0 auto">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            <span style="font-size: 14px">点击或拖拽上传一张参考图片</span>
+        `
+    }
+
+    globalThis.image_selector_placeholder = reset_image_selector_placeholder
+
+    reset_image_selector_placeholder()
+
+    globalThis.video_container_mouseover = function(container) {
+        const video = container.querySelector("video")
+        playSafely(video)
+        if (!isMobile()) {
+            container.querySelector("#actions_container").style.display = "grid"
+        }
+    }
+
+    globalThis.video_container_mouseout = function(container) {
+        const video = container.querySelector("video")
+        video.pause()
+        if (!isMobile()) {
+            container.querySelector("#actions_container").style.display = "none"
+        }
+    }
+
+    function isMobile() {
+        return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    }
+
+    function playSafely(video) {
+        video.pause();
+        video.currentTime = 0;
+        const nopromise = {
+            catch: new Function()
+        };
+        (video.play() || nopromise).catch(function(){});
+    }
 }

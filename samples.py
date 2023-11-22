@@ -1,5 +1,4 @@
-#玩偶、永生花、水壶、帆布鞋、手提包
-samples = [
+model_samples = [
     {
         "name": "toy",
         "cover": "resource/cover_4.png",
@@ -32,3 +31,25 @@ samples = [
     },
 ]
 
+t2m_samples = [
+    {
+        "id": 0,
+        "prompt": "一只特立独行的猪",
+        "model_url": "//xr-property.oss-cn-hangzhou.aliyuncs.com/dataset/Ds.B6473MQGRMYU2/model.xr"
+    },
+    {
+        "id": 1,
+        "prompt": "一只特立独行的牛",
+        "model_url": "//xr-property.oss-cn-hangzhou.aliyuncs.com/dataset/Ds.B6473MQGRMYU2/model.xr"
+    },
+    {
+        "id": 2,
+        "prompt": "一只特立独行的羊",
+        "model_url": "//xr-property.oss-cn-hangzhou.aliyuncs.com/dataset/Ds.B6473MQGRMYU2/model.xr"
+    },
+    {
+        "id": 3,
+        "prompt": "一只特立独行的狗",
+        "model_url": "//xr-property.oss-cn-hangzhou.aliyuncs.com/dataset/Ds.B6473MQGRMYU2/model.xr"
+    },
+]

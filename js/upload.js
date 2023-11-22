@@ -37,7 +37,7 @@
 
     const options = {
         progress: (p, cpt, res) => {
-            console.log("上传进度", p)
+            console.log("上传进度", p, cpt, res)
             upload_build_btn.textContent = `上传中...(${(p * 100).toFixed(1)}%)`
             progress_bar.style.width = `${p*100}%`
         },
@@ -53,7 +53,7 @@
     client.multipartUpload(sts_json.key + file_name, file, options)
         .then(function (result) {
             console.log("上传结果", result)
-            if (result.res.statusCode == 200) {
+            if (result.res.statusCode === 200) {
                 upload_clear_btn.click()
                 upload_clear_btn.style.opacity = 1
                 progress_bar.style.width = 0
@@ -76,14 +76,14 @@
                     submit_btn.style.opacity = 0.6
                     submit_btn.disabled = false
 
-                    var secs = 5
+                    let secs = 5;
                     const skip_txt = document.querySelector("#skip")
                     skip_txt.style.display = "block"
                     skip_txt.textContent = "5秒后关闭"
                     intervalHandle = setInterval(() => {
                         secs = secs - 1
                         document.querySelector("#skip").textContent = `${secs}秒后关闭`
-                        if (secs == 0) {
+                        if (secs === 0) {
                             clearInterval(intervalHandle)
                             completion_popup.style.display = "none"
                         }
@@ -98,7 +98,7 @@
             upload_helper_txt.querySelector("textarea").value = `{"success": false, "error": ${err}}`
         })
 
-        document.querySelector("#email").addEventListener("input", function(e) {
+        document.querySelector("#email").addEventListener("input", function() {
             clearInterval(intervalHandle)
             const saved_email = user_email_txt.querySelector("textarea").value
             const skip_txt = document.querySelector("#skip")

@@ -1,14 +1,15 @@
+from datetime import datetime
 import os
 import time
+import requests
 
 from alibabacloud_tea_openapi.models import Config
 from alibabacloud_xrengine20230313.client import Client
 from alibabacloud_xrengine20230313.models import PopCreateObjectProjectRequest, PopListObjectProjectRequest, \
     PopVideoSaveSourceRequest, PopBuildObjectProjectRequest, AuthUserRequest, LoginModelScopeRequest, \
-    PopListObjectCaseRequest, UpdateUserEmailRequest
+    PopListObjectCaseRequest, UpdateUserEmailRequest, PopObjectProjectDetailRequest, PopObjectRetrievalRequest, \
+    PopObjectRetrievalUploadDataRequest
 
-
-# ID [2023-07-12 10:43:36] Triggered fetch_uuid: a28d98c229cc31b26d226bae566cbb0
 
 def setup(ak: str, sk: str, endpoint: str):
     config = Config(access_key_id=ak, access_key_secret=sk, endpoint=endpoint)
@@ -23,10 +24,12 @@ def refresh_jwt(client: Client, jwt):
 def login(client: Client, userid):
     return client.login_model_scope(LoginModelScopeRequest(token=userid, type="MODEL_SCOPE"))
 
+
 def update_user_email(client: Client, email, jwt):
     resp = client.update_user_email(UpdateUserEmailRequest(email=email, jwt_token=jwt))
     print("update email:", resp)
     return resp
+
 
 def create_project(client: Client, jwt, share):
     """
@@ -50,60 +53,52 @@ def create_project(client: Client, jwt, share):
     return client.pop_create_object_project(request)
 
 
-def list_projects(client: Client, jwt):
+def list_projects(client: Client, jwt, size=5):
     """
         列出项目
 
         Args:
             client (Client): API客户端对象
             jwt (str): 用户令牌
+            size: 数量
 
         Returns:
             PopListObjectProjectResponse: 列出项目的响应结果
-        """
+    """
     request = PopListObjectProjectRequest(jwt_token=jwt,
                                           current=1,
-                                          size=5,
+                                          size=size,
                                           with_source=True,
                                           custom_source="model_scope",
                                           status="MAKING,MAKING_FAILED,MAKING_SUCCESS,VIEWABLE")
     return client.pop_list_object_project(request)
 
 
-# def upload_to_oss(client,
-#                   project_id,
-#                   access_id,
-#                   policy,
-#                   signature,
-#                   host,
-#                   file_path,
-#                   oss_dir,
-#                   expire,
-#                   progress_callback):
-#     file_name = os.path.basename(file_path)
-#     key = oss_dir + "videos/" + file_name
-#     params = dict()
-#     params["name"] = file_name
-#     params["key"] = key
-#     params["policy"] = policy
-#     params["OSSAccessKeyId"] = access_id
-#     params["success_action_status"] = "200"
-#     params["signature"] = signature
-#     params["expire"] = expire
-#     params["x-oss-meta-env"] = "production"
-#     print(params)
-#
-#     r = requests.post(f"https://{host}",
-#                       files={'file': open(file_path, 'rb')},
-#                       data=params)
-#     print("response:", r.status_code, r.content)
-#
-#     if r.status_code == 200:
-#         print(f'uploaded success: {key}.')
-#         client.pop_video_save_source(PopVideoSaveSourceRequest(project_id=project_id, source_type="VID"))
-#         ret = client.pop_build_object_project(PopBuildObjectProjectRequest(project_id=project_id))
-#         return ret.body.success
-#     return False
+def upload_to_oss(access_id,
+                  policy,
+                  signature,
+                  host,
+                  file_path,
+                  oss_dir,
+                  expire):
+    file_name = f"modelscope_{int(datetime.timestamp(datetime.now()))}" + (os.path.splitext(file_path)[1] or '.png')
+    key = oss_dir + file_name
+    params = dict()
+    params["name"] = file_name
+    params["key"] = key
+    params["policy"] = policy
+    params["OSSAccessKeyId"] = access_id
+    params["success_action_status"] = "200"
+    params["signature"] = signature
+    params["expire"] = expire
+    print(params)
+
+    r = requests.post(f"https://{host}",
+                      files={'file': open(file_path, 'rb')},
+                      data=params)
+    print("response:", r.status_code, r.content)
+
+    return r.status_code == 200, f"oss://{host.split('.')[0]}/{key}"
 
 
 def create_project_sts(client: Client, jwt, share):
@@ -123,6 +118,7 @@ def create_project_sts(client: Client, jwt, share):
     params["key"] = sts_token.dir + "videos/"
     params["expire"] = sts_token.expiration
     return params
+
 
 #
 # def create_then_upload(client: Client, jwt, share, video_path, progress_callback):
@@ -166,5 +162,65 @@ def action_post_upload(client: Client, jwt, project_id):
     print("build project: ", ret)
     return ret.body.success
 
+
 def list_featured_projects(client: Client, jwt):
     return client.pop_list_object_case(PopListObjectCaseRequest(jwt_token=jwt, size=12))
+
+
+def get_project_detail(client: Client, jwt, project_id):
+    return client.pop_object_project_detail(PopObjectProjectDetailRequest(jwt_token=jwt, project_id=project_id))
+
+
+def search_3d_objects(client: Client, jwt, input_type, query, image_path):
+    if input_type == "图片搜索":
+        source_type = "imageUrl"
+        oss_policy_data = client.pop_object_retrieval_upload_data(
+            PopObjectRetrievalUploadDataRequest(jwt_token=jwt)).body.data
+        print("oss_policy: ", oss_policy_data)
+        result = upload_to_oss(oss_policy_data.access_id,
+                               oss_policy_data.policy,
+                               oss_policy_data.signature,
+                               oss_policy_data.host,
+                               image_path,
+                               oss_policy_data.dir,
+                               oss_policy_data.expire)
+        print("upload result: ", result)
+        content = result[1]
+    else:
+        source_type = "textPrompt"
+        content = query
+    return client.pop_object_retrieval(
+        PopObjectRetrievalRequest(jwt_token=jwt, source_type=source_type, content=content))
+
+
+def parse_project_list(project_list):
+    def parse_project(project):
+        print("project", project)
+        try:
+            build_result_url = project.dataset.build_result_url
+            glb_url = build_result_url.get("glbModel", None) if build_result_url else None
+            return ProjectModel(
+                id=project.id,
+                title=project.title,
+                cover_url=project.dataset.cover_url,
+                model_url=project.dataset.model_url,
+                preview_url=project.dataset.preview_url,
+                status=project.status,
+                glb_url=glb_url
+            )
+        except IndexError:
+            return None
+
+    return list(map(parse_project, project_list))
+
+
+# define a ProjectModel class to store project info
+class ProjectModel:
+    def __init__(self, id, title, cover_url, model_url, preview_url, status, glb_url):
+        self.id = id
+        self.title = title
+        self.cover_url = cover_url
+        self.model_url = model_url
+        self.preview_url = preview_url
+        self.status = status
+        self.glb_url = glb_url
