@@ -579,35 +579,35 @@ a[data-tooltip]:hover:before {
 
 /**media sources**/
 #app_qrcode {
-    content: url("https://modelscope.cn/api/v1/studio/ggmotest/gg_xr_test/repo?Revision=master&FilePath=resource/app_qrcode.jpg&View=true");
+    content: url("https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/app_qrcode.jpg&View=true");
 }
 
 #feedback_qrcode {
-    content: url("https://modelscope.cn/api/v1/studio/ggmotest/gg_xr_test/repo?Revision=master&FilePath=resource/feedback_qrcode.JPG&View=true");
+    content: url("https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/feedback_qrcode.JPG&View=true");
 }
 
 #download, #sd_download, #hd_download {
-    content: url("https://modelscope.cn/api/v1/studio/ggmotest/gg_xr_test/repo?Revision=master&FilePath=resource/download.png&View=true");
+    content: url("https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/download.png&View=true");
 }
 
 #share, #sd_share, #hd_share {
-    content: url("https://modelscope.cn/api/v1/studio/ggmotest/gg_xr_test/repo?Revision=master&FilePath=resource/share.png&View=true");
+    content: url("https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/share.png&View=true");
 }
 
 #build_failed {
-    content: url("https://modelscope.cn/api/v1/studio/ggmotest/gg_xr_test/repo?Revision=master&FilePath=resource/close.png&View=true");
+    content: url("https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/close.png&View=true");
 }
 
 #arrow1 {
-    content: url("https://modelscope.cn/api/v1/studio/ggmotest/gg_xr_test/repo?Revision=master&FilePath=resource/arrow.png&View=true");
+    content: url("https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/arrow.png&View=true");
 }
 
 #arrow2 {
-    content: url("https://modelscope.cn/api/v1/studio/ggmotest/gg_xr_test/repo?Revision=master&FilePath=resource/arrow.png&View=true");
+    content: url("https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/arrow.png&View=true");
 }
 
 #double_arrow {
-    content: url("https://modelscope.cn/api/v1/studio/ggmotest/gg_xr_test/repo?Revision=master&FilePath=resource/double_arrow.png&View=true");
+    content: url("https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/double_arrow.png&View=true");
 }
 
 @media screen and (max-width: 480px) {
