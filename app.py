@@ -209,7 +209,7 @@ def search_btn_on_click(jwt_txt, input_type, txt, image):
                 search_error_label.update(visible=True, value=error_html)
             ]
         return [
-            search_results.update(value=project_list_html(ret.body.data)),
+            search_results.update(value=project_list_html(ret.body.data, biz_usage="text_to_obj")),
             search_error_label.update(visible=False)
         ]
     except:
