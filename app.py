@@ -253,6 +253,11 @@ def search_type_radio_changed(radio, image, txt):
         ]
 
 
+# 在页面加载时获取历史记录列表
+def app_post_load(jwt):
+    print("app_post_load jwt: ", jwt)
+    return featured_projects_html.update(value=fetch_featured_projects_to_html(jwt))
+
 def gr_on_load(uuid):
     print(f"Triggered fetch_uuid: {uuid}", flush=True)
 
@@ -268,8 +273,7 @@ def gr_on_load(uuid):
                 uuid_txt.update(test_user_id),
                 jwt_token_txt.update(jwt),
                 usr_email_text.update(email),
-                projects_html.update(value=fetch_project_list_to_html(jwt)),
-                featured_projects_html.update(value=fetch_featured_projects_to_html(jwt))
+                projects_html.update(value=fetch_project_list_to_html(jwt))
             ]
         except (NameError, AttributeError):
             raise gr.exceptions.Error("用户登录失败，请刷新重试。")
@@ -460,13 +464,12 @@ with gr.Blocks(css=css) as demo:
                   uuid_txt,
                   jwt_token_txt,
                   usr_email_text,
-                  projects_html,
-                  featured_projects_html
-              ],
+                  projects_html
+                ],
               _js=app_js) \
         .then(fn=None,
               _js=app_post_load_js)
-    demo.load(t2m_htmlloaded, _js=t2m_js, inputs=None, outputs=None)
+    demo.load(t2m_htmlloaded, _js=t2m_js, inputs=None, outputs=None).then(fn=app_post_load, inputs=jwt_token_txt, outputs=[featured_projects_html])
 
 demo.queue()
 demo.launch()
