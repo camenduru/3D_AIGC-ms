@@ -15,14 +15,14 @@ xr_client = Client(config)
 
 async def text2Substance(jwt, prompt):
     try:
-        create_request = PopCreateObjectGenerationProjectRequest().from_map({
-            "Title": '魔搭项目' + str(datetime.datetime.now().time()),
-            "ExtInfo": json.dumps({
+        create_request = PopCreateObjectGenerationProjectRequest(
+            title='魔搭项目' + str(datetime.datetime.now().time()),
+            ext_info=json.dumps({
                 "prompt": str(prompt),
             }),
-            "Intro": '',
-            "JwtToken": jwt
-        })
+            intro='',
+            jwt_token=jwt
+        )
         create_response = await xr_client.pop_create_object_generation_project_async(create_request)
         print('[TEXT2OBJ_text2Substance] create_response:', str(create_response))
         project_id = ''
@@ -30,8 +30,8 @@ async def text2Substance(jwt, prompt):
         if create_response.status_code == 200 and create_response.body.success is True:
             project_id = create_response.body.data.id
             build_response = await xr_client.pop_build_object_generation_project_async(
-                PopBuildObjectGenerationProjectRequest().from_map({"JwtToken": jwt, "ProjectId": project_id}))
-            if (build_response.status_code == 200 and build_response.body.success is True):
+                PopBuildObjectGenerationProjectRequest(jwt_token=jwt, project_id=project_id))
+            if build_response.status_code == 200 and build_response.body.success is True:
                 success = True
                 return {"success": True, "id": create_response.body.data.id}
     except Exception as e:
@@ -43,8 +43,7 @@ async def text2Substance(jwt, prompt):
 
 async def queryText2ObjModelDetail(id):
     try:
-        result = (await xr_client.pop_query_object_generation_project_detail_async(
-            PopQueryObjectGenerationProjectDetailRequest().from_map({"ProjectId": id}))).to_map()
+        result = (await xr_client.pop_query_object_generation_project_detail_async(PopQueryObjectGenerationProjectDetailRequest(project_id=id))).to_map()
         result = transformResponse(result)
         if result['statusCode'] == 200 and result["body"]['success'] is True:
             status = result['body']['data']['status']
@@ -73,7 +72,7 @@ def queryText2ObjModelsDetail(ids):
         result = (xr_client.pop_batch_query_object_generation_project_status(
             PopBatchQueryObjectGenerationProjectStatusRequest().from_map({"ProjectIds": ids}))).to_map()
         result = transformResponse(result)
-        if (result["statusCode"] == 200 and result["body"]["success"] is True):
+        if result["statusCode"] == 200 and result["body"]["success"] is True:
             return result["body"]["data"]
         else:
             print('[TEXT2OBJ_queryText2ObjModelsDetail] error:', result)
@@ -85,11 +84,10 @@ def queryText2ObjModelsDetail(ids):
 
 def queryHistoryProjectList(jwt, current, size):
     try:
-        result = xr_client.pop_list_object_generation_project(PopListObjectGenerationProjectRequest().from_map(
-            {"JwtToken": jwt, "Current": current, "Size": size})).to_map()
+        result = xr_client.pop_list_object_generation_project(PopListObjectGenerationProjectRequest(jwt_token=jwt, current=current, size=size)).to_map()
         result = transformResponse(result)
         print(f'[TEXT2OBJ_queryHistoryProjectList] result: {result}')
-        if (result['statusCode'] == 200 and result['body']['success'] is True):
+        if result['statusCode'] == 200 and result['body']['success'] is True:
             return {
                 'total': result['body']['total'],
                 'list': result['body']['data']

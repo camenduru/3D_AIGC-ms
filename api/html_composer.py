@@ -8,14 +8,14 @@ project_item_html = Path("htmls/project_item.html").read_text()
 model_video_item = Path("htmls/model_video_item.html").read_text()
 
 
-def model_preview_url(url, title):
+def model_preview_url(url, title, biz_usage):
     if not url:
         return ""
-    return f"https://market.m.taobao.com/app/xr-paas/xr-paas-portal/index.html#/h5-modelviewer?modelUrl={quote(url)}&modelName={quote(title)}&bizUsage=inverse_rendering"
+    return f"https://market.m.taobao.com/app/xr-paas/xr-paas-portal/index.html#/h5-modelviewer?modelUrl={quote(url)}&modelName={quote(title)}&bizUsage={biz_usage}"
 
 
-def single_model_viewer_iframe(url, glb_url, title, show_actions: bool):
-    iframe = f"""<iframe class='model_container' src ='{model_preview_url(url, title)}'></iframe>"""
+def single_model_viewer_iframe(url, glb_url, title, biz_usage, show_actions: bool):
+    iframe = f"""<iframe class='model_container' src ='{model_preview_url(url, title, biz_usage)}'></iframe>"""
     iframe += model3d_actions_html if show_actions else ""
 
     soup = BeautifulSoup(iframe, 'html.parser')
@@ -24,13 +24,13 @@ def single_model_viewer_iframe(url, glb_url, title, show_actions: bool):
         download_action["href"] = glb_url
     share_action = soup.select_one("#share_action")
     if share_action:
-        share_action["onclick"] = f"shareSDModelClick('{model_preview_url(url, title)}')"
+        share_action["onclick"] = f"shareSDModelClick('{model_preview_url(url, title, biz_usage)}')"
 
     return str(soup)
 
 
 # project list 格式：参看api_manager.parse_project_list返回值
-def project_list_html(project_list):
+def project_list_html(project_list, biz_usage):
     if not project_list:
         return "<div style='text-align: center;'>暂无数据</div>"
 
@@ -45,13 +45,13 @@ def project_list_html(project_list):
                 model_video = soup.select_one(".model_video_item")
                 model_video["style"] = f"background-image: url('{proj.cover_url}');"
                 model_video["src"] = preview_url
-                model_video["onclick"] = f"window.open('{model_preview_url(proj.model_url, proj.title)}', '_blank')"
+                model_video["onclick"] = f"window.open('{model_preview_url(proj.model_url, proj.title, biz_usage)}', '_blank')"
 
                 download_action = soup.select_one("#download_link")
                 download_action["href"] = proj.glb_url
 
                 share_action = soup.select_one("#share_action")
-                share_action["onclick"] = f"shareSDModelClick('{model_preview_url(proj.model_url, proj.title)}')"
+                share_action["onclick"] = f"shareSDModelClick('{model_preview_url(proj.model_url, proj.title, biz_usage)}')"
                 return str(soup)
 
         except IndexError:

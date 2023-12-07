@@ -1,6 +1,6 @@
 () => {
 
-    const path = window.parent.location.pathname
+    const path = window.location.pathname
     console.log("current path after domain:", path)
     const is_prod =  (path.indexOf('3D_AIGC') !== -1) //线上创空间名字为3D_AIGC
     /**
@@ -10,20 +10,20 @@
     const stringifyObject = obj => Object.keys(obj).map((k) => k + '=' + obj[k]).join('&');
 
     // function to get url parameter
-    const getUrlParameterValue = (paramName, window) => {
-        let sPageURL = decodeURIComponent(window.location.search.substring(1)),
-            sURLVariables = sPageURL.split('&'),
-            sParameterName,
-            i;
-
-        for (i = 0; i < sURLVariables.length; i++) {
-            sParameterName = sURLVariables[i].split('=');
-
-            if (sParameterName[0] === paramName) {
-                return sParameterName[1] === undefined ? "" : sParameterName[1];
-            }
-        }
-    };
+    // const getUrlParameterValue = (paramName, window) => {
+    //     let sPageURL = decodeURIComponent(window.location.search.substring(1)),
+    //         sURLVariables = sPageURL.split('&'),
+    //         sParameterName,
+    //         i;
+    //
+    //     for (i = 0; i < sURLVariables.length; i++) {
+    //         sParameterName = sURLVariables[i].split('=');
+    //
+    //         if (sParameterName[0] === paramName) {
+    //             return sParameterName[1] === undefined ? "" : sParameterName[1];
+    //         }
+    //     }
+    // };
 
     //function to send tracking events
     const sendEventTracking = (eventName, eventParams = {}) => {
@@ -62,11 +62,11 @@
      * */
 
     // 是否来源于邮件点击
-    const param_from_email = getUrlParameterValue("from_email", window.parent)
+    // const param_from_email = getUrlParameterValue("from_email", window.parent)
     // 项目ID
-    const param_project_id = getUrlParameterValue("project_id", window.parent)
+    // const param_project_id = getUrlParameterValue("project_id", window.parent)
     // 是否成功
-    const param_is_success = getUrlParameterValue("is_success", window.parent)
+    // const param_is_success = getUrlParameterValue("is_success", window.parent)
 
     // 拿到aplus对象
     const q = (window.aplus_queue || (window.aplus_queue = []));
@@ -88,22 +88,22 @@
             // 注意：key不能以aliyun、aplus开头，否则会被过滤掉
             // 'user_agent': navigator.userAgent
             // 是否来源于邮件点击
-            from_email: param_from_email,
+            // from_email: param_from_email,
             // 项目ID
-            project_id: param_project_id,
+            // project_id: param_project_id,
             // 是否成功
-            is_success: param_is_success
+            // is_success: param_is_success
         }]
     });
 
     // send event if click from email
-    if (param_from_email === 'true') {
-        console.log("open from email")
-        sendEventTracking("/ms_3d_obj.other.open_from_email", {
-            project_id: param_project_id,
-            is_success: param_is_success
-        })
-    }
+    // if (param_from_email === 'true') {
+    //     console.log("open from email")
+    //     sendEventTracking("/ms_3d_obj.other.open_from_email", {
+    //         project_id: param_project_id,
+    //         is_success: param_is_success
+    //     })
+    // }
 
     //select the most recent project if any.
     const first_project_vid = document.querySelector('.project_vid_container')
@@ -135,7 +135,7 @@
         link_input.disabled = true
 
         qrcode_img.innerHTML = ""
-        new QRCode(qrcode_img, {
+        new QRCode(qrcode_img, { // eslint-disable-line
             text: link_input.value,
             width: 200,
             height: 200,
@@ -279,8 +279,9 @@
     const search_btn = document.querySelector('#search_btn');
     search_btn.addEventListener('click', function() {
         const search_type = document.querySelector('#search_type_radio .wrap label.selected span').textContent
-        console.log("search type: ", search_type);
-        sendEventTracking('/ms_3d_obj.click_search', { type: search_type});
+        const search_txt = document.querySelector('#search_input_txt textarea').value.trim()
+        console.log("search type: ", search_type, "search txt: ", search_txt)
+        sendEventTracking('/ms_3d_obj.click_search', { type: search_type, search_query: search_txt});
     });
 
     //track click view mesh button

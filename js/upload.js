@@ -27,7 +27,7 @@
     } catch (e) {
         return alert('上传失败: ' + e.message);
     }
-    const client = new OSS({
+    const client = new OSS({ // eslint-disable-line
         accessKeyId: sts_json.ak,
         accessKeySecret: sts_json.sk,
         stsToken: sts_json.sts,
