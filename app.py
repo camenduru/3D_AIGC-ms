@@ -428,35 +428,35 @@ with gr.Blocks(css=css) as demo:
                   _js="() => [document.querySelector('#jwt_token textarea').value, document.querySelector('.project_vid_container.selected').getAttribute('data-fast-project-id')] ") \
             .then(fn=None,
                   _js=project_item_click_js)
-    with gr.Tab("3D模型检索", elem_id="model_search_tab"):
-        with gr.Column():
-            search_type_radio = gr.Radio(["图片搜索", "文本搜索"], value="图片搜索", show_label=False, container=False,
-                                         elem_id="search_type_radio")
-            with gr.Row():
-                search_input_img = gr.Image(label="图片", elem_id="image_selector", show_label=False, type='filepath')
-                # gr.HTML(value="<span style='font-size: 15px;'>或</span>", elem_id="or_label")
-                search_input_txt = gr.Text(show_label=False, elem_id="search_input_txt", lines=3,
-                                           info="输入一段3D模型的文字描述", placeholder="建议使用英文搜索",
-                                           visible=False)
-            search_error_label = gr.HTML(visible=False)
-            search_btn = gr.Button(value="搜索3D模型", elem_id="search_btn", interactive=False)
-
-            search_results_header = gr.HTML("<h2 style='text-align:center; margin-top: 20px;'>搜索结果</h2>")
-            search_results = gr.HTML(elem_id="search_model3d_results")
-
-        search_type_radio.change(search_type_radio_changed,
-                                 inputs=[search_type_radio, search_input_img, search_input_txt],
-                                 outputs=[search_input_img, search_input_txt, search_btn, search_error_label])
-        search_input_img.clear(fn=None, _js="""
-            () => { image_selector_placeholder() }
-        """)
-        search_input_img.change(search_input_changed, inputs=[search_type_radio, search_input_img, search_input_txt],
-                                outputs=[search_btn, search_error_label])
-        search_input_txt.change(search_input_changed, inputs=[search_type_radio, search_input_img, search_input_txt],
-                                outputs=[search_btn, search_error_label])
-        search_btn.click(search_btn_on_click,
-                         inputs=[jwt_token_txt, search_type_radio, search_input_txt, search_input_img],
-                         outputs=[search_results, search_error_label])
+    # with gr.Tab("3D模型检索", elem_id="model_search_tab"):
+    #     with gr.Column():
+    #         search_type_radio = gr.Radio(["图片搜索", "文本搜索"], value="图片搜索", show_label=False, container=False,
+    #                                      elem_id="search_type_radio")
+    #         with gr.Row():
+    #             search_input_img = gr.Image(label="图片", elem_id="image_selector", show_label=False, type='filepath')
+    #             # gr.HTML(value="<span style='font-size: 15px;'>或</span>", elem_id="or_label")
+    #             search_input_txt = gr.Text(show_label=False, elem_id="search_input_txt", lines=3,
+    #                                        info="输入一段3D模型的文字描述", placeholder="建议使用英文搜索",
+    #                                        visible=False)
+    #         search_error_label = gr.HTML(visible=False)
+    #         search_btn = gr.Button(value="搜索3D模型", elem_id="search_btn", interactive=False)
+    #
+    #         search_results_header = gr.HTML("<h2 style='text-align:center; margin-top: 20px;'>搜索结果</h2>")
+    #         search_results = gr.HTML(elem_id="search_model3d_results")
+    #
+    #     search_type_radio.change(search_type_radio_changed,
+    #                              inputs=[search_type_radio, search_input_img, search_input_txt],
+    #                              outputs=[search_input_img, search_input_txt, search_btn, search_error_label])
+    #     search_input_img.clear(fn=None, _js="""
+    #         () => { image_selector_placeholder() }
+    #     """)
+    #     search_input_img.change(search_input_changed, inputs=[search_type_radio, search_input_img, search_input_txt],
+    #                             outputs=[search_btn, search_error_label])
+    #     search_input_txt.change(search_input_changed, inputs=[search_type_radio, search_input_img, search_input_txt],
+    #                             outputs=[search_btn, search_error_label])
+    #     search_btn.click(search_btn_on_click,
+    #                      inputs=[jwt_token_txt, search_type_radio, search_input_txt, search_input_img],
+    #                      outputs=[search_results, search_error_label])
 
     demo.load(fn=gr_on_load,
               inputs=uuid_txt,

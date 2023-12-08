@@ -581,9 +581,6 @@ a[data-tooltip]:hover:before {
     margin-bottom: -14px !important;
 }
 
-#model_search_tab {
-   display: none;
-}
 
 /**media sources**/
 #app_qrcode {
