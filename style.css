@@ -551,9 +551,9 @@ a[data-tooltip]:hover:before {
     padding: 4px;
 }
 
-/*.tab-nav button:last-child, .tab-nav button:nth-last-child(2) {*/
-/*    pointer-events: none;*/
-/*}*/
+.tab-nav button:last-child {
+    pointer-events: none;
+}
 
 #sd_model_actions, #hd_model_actions {
     position: absolute;
