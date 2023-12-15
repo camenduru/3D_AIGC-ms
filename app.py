@@ -39,7 +39,7 @@ def sample_data_on_select(evt: gr.SelectData):
         item = model_samples[evt.index]
         return [source_video.update(value=item["video"]),
                 model_state_container.update(visible=False),
-                remote_model_viewer.update(value=single_model_viewer_iframe(item["model"], None, item["name"], False),
+                remote_model_viewer.update(value=single_model_viewer_iframe(item["model"], None, item["name"], "inverse_rendering", False),
                                            visible=True)
                 ]
     except IndexError:
