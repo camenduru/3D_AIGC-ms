@@ -60,18 +60,18 @@ def prepare_for_upload(jwt_token, share_check):
     return upload_helper_txt.update(value=json.dumps(result))
 
 
-def upload_completion_btn_click(jwt_token, upload_txt):
+async def upload_completion_btn_click(jwt_token, upload_txt):
     print("txt: ", upload_txt)
     project_id = json.loads(upload_txt)["proj_id"]
     success = action_post_upload(client, jwt_token, project_id)
-    return projects_html.update(fetch_project_list_to_html(jwt_token))
+    return projects_html.update(await fetch_project_list_to_html(jwt_token))
 
 
-def fetch_project_list_to_html(jwt_token):
+async def fetch_project_list_to_html(jwt_token):
     try:
         if not jwt_token:
             return []
-        resp = list_projects(client, jwt=jwt_token)
+        resp = await list_projects(client, jwt=jwt_token)
         print("list projects:", resp)
 
         def get_covers(proj):
@@ -252,13 +252,12 @@ def search_type_radio_changed(radio, image, txt):
             search_error_label.update(visible=False)
         ]
 
-
 # 在页面加载时获取历史记录列表
 def app_post_load(jwt):
     print("app_post_load jwt: ", jwt)
     return featured_projects_html.update(value=fetch_featured_projects_to_html(jwt))
 
-def gr_on_load(uuid):
+async def gr_on_load(uuid):
     print(f"Triggered fetch_uuid: {uuid}", flush=True)
 
     test_user_id = uuid #or "a28d98bc229cc31b26d226bae566cbb0"
@@ -273,7 +272,7 @@ def gr_on_load(uuid):
                 uuid_txt.update(test_user_id),
                 jwt_token_txt.update(jwt),
                 usr_email_text.update(email),
-                projects_html.update(value=fetch_project_list_to_html(jwt))
+                projects_html.update(value=await fetch_project_list_to_html(jwt))
             ]
         except (NameError, AttributeError):
             raise gr.exceptions.Error("用户登录失败，请刷新重试。")
@@ -465,11 +464,11 @@ with gr.Blocks(css=css) as demo:
                   jwt_token_txt,
                   usr_email_text,
                   projects_html
-                ],
+              ],
               _js=app_js) \
         .then(fn=None,
               _js=app_post_load_js)
-    demo.load(t2m_htmlloaded, _js=t2m_js, inputs=None, outputs=None).then(fn=app_post_load, inputs=jwt_token_txt, outputs=[featured_projects_html])
+    demo.load(fn=t2m_htmlloaded, _js=t2m_js).then(fn=app_post_load, inputs=jwt_token_txt, outputs=[featured_projects_html])
 
-demo.queue()
+demo.queue(concurrency_count=10)
 demo.launch()
