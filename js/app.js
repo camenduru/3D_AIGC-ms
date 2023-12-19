@@ -28,7 +28,7 @@ async () => {
     qrcode_script.setAttribute("async", "async");
     document.body.appendChild(qrcode_script);
 
-    const path = window.location.pathname
+    const path = window.location.href
     const is_prod =  (path.indexOf('3D_AIGC') !== -1) //线上创空间名字为3D_AIGC
 
     if (is_prod) {

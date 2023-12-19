@@ -1,6 +1,6 @@
 () => {
 
-    const path = window.location.pathname
+    const path = window.location.href
     console.log("current path after domain:", path)
     const is_prod =  (path.indexOf('3D_AIGC') !== -1) //线上创空间名字为3D_AIGC
     /**
