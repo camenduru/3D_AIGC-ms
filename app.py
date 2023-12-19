@@ -470,5 +470,5 @@ with gr.Blocks(css=css) as demo:
               _js=app_post_load_js)
     demo.load(fn=t2m_htmlloaded, _js=t2m_js).then(fn=app_post_load, inputs=jwt_token_txt, outputs=[featured_projects_html])
 
-demo.queue(concurrency_count=10)
+demo.queue(concurrency_count=300)
 demo.launch()
