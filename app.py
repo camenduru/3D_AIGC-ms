@@ -8,7 +8,7 @@ import gradio as gr
 from api.api_manager import setup, list_projects, login, list_featured_projects, create_project_sts, action_post_upload, \
     update_user_email, get_project_detail, search_3d_objects, parse_project_list
 from api.html_composer import single_model_viewer_iframe, project_video_constructor, project_list_html
-from api.text2obj.utils import t2m_doTask, t2m_htmlloaded, t2m_refreshModelsStatus, t2m_updateOutput, \
+from api.text2obj.utils import t2m_doTask, t2m_html_loaded, t2m_refreshModelsStatus, t2m_updateOutput, \
     t2m_loadHistoryList
 from config.env import access_key_id, access_key_secret, api_endpoint
 from samples import *
@@ -295,7 +295,7 @@ with gr.Blocks(css=css) as demo:
             visible=False)
         t2m_json = gr.JSON(visible=False)
         t2m_json.change(t2m_updateOutput, inputs=[t2m_json], outputs=[t2m_output])
-        t2m_ticker = gr.Label(update_time, visible=False, every=1)
+        t2m_ticker = gr.Label(update_time, visible=False, every=30) #每30秒轮询一遍状态
         t2m_ticker.change(t2m_refreshModelsStatus, inputs=[t2m_input, t2m_stats], outputs=[t2m_stats, t2m_json],
                           _js='''(i, s) => [window.getText2ObjMakingList(), s]''')
 
@@ -468,7 +468,7 @@ with gr.Blocks(css=css) as demo:
               _js=app_js) \
         .then(fn=None,
               _js=app_post_load_js)
-    demo.load(fn=t2m_htmlloaded, _js=t2m_js).then(fn=app_post_load, inputs=jwt_token_txt, outputs=[featured_projects_html])
+    demo.load(fn=t2m_html_loaded, _js=t2m_js).then(fn=app_post_load, inputs=jwt_token_txt, outputs=[featured_projects_html])
 
 demo.queue(concurrency_count=300)
 demo.launch()
