@@ -30,5 +30,3 @@ saved_model/**/* filter=lfs diff=lfs merge=lfs -text
 **/*ckpt*data* filter=lfs diff=lfs merge=lfs -text
 **/*ckpt*.meta filter=lfs diff=lfs merge=lfs -text
 **/*ckpt*.index filter=lfs diff=lfs merge=lfs -text
-*.safetensors filter=lfs diff=lfs merge=lfs -text
-*.ckpt filter=lfs diff=lfs merge=lfs -text

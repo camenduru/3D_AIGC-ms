@@ -8,7 +8,7 @@ import gradio as gr
 from api.api_manager import setup, list_projects, login, list_featured_projects, create_project_sts, action_post_upload, \
     update_user_email, get_project_detail, search_3d_objects, parse_project_list
 from api.html_composer import single_model_viewer_iframe, project_video_constructor, project_list_html
-from api.text2obj.utils import t2m_doTask, t2m_htmlloaded, t2m_refreshModelsStatus, t2m_updateOutput, \
+from api.text2obj.utils import t2m_doTask, t2m_html_loaded, t2m_refreshModelsStatus, t2m_updateOutput, \
     t2m_loadHistoryList
 from config.env import access_key_id, access_key_secret, api_endpoint
 from samples import *
@@ -39,7 +39,7 @@ def sample_data_on_select(evt: gr.SelectData):
         item = model_samples[evt.index]
         return [source_video.update(value=item["video"]),
                 model_state_container.update(visible=False),
-                remote_model_viewer.update(value=single_model_viewer_iframe(item["model"], None, item["name"], False),
+                remote_model_viewer.update(value=single_model_viewer_iframe(item["model"], None, item["name"], "inverse_rendering", False),
                                            visible=True)
                 ]
     except IndexError:
@@ -60,18 +60,18 @@ def prepare_for_upload(jwt_token, share_check):
     return upload_helper_txt.update(value=json.dumps(result))
 
 
-def upload_completion_btn_click(jwt_token, upload_txt):
+async def upload_completion_btn_click(jwt_token, upload_txt):
     print("txt: ", upload_txt)
     project_id = json.loads(upload_txt)["proj_id"]
     success = action_post_upload(client, jwt_token, project_id)
-    return projects_html.update(fetch_project_list_to_html(jwt_token))
+    return projects_html.update(await fetch_project_list_to_html(jwt_token))
 
 
-def fetch_project_list_to_html(jwt_token):
+async def fetch_project_list_to_html(jwt_token):
     try:
         if not jwt_token:
             return []
-        resp = list_projects(client, jwt=jwt_token)
+        resp = await list_projects(client, jwt=jwt_token)
         print("list projects:", resp)
 
         def get_covers(proj):
@@ -117,7 +117,9 @@ def fetch_featured_projects_to_html(jwt_token):
     try:
         resp = list_featured_projects(client, jwt_token)
         print("featured projects:", resp)
-        return project_list_html(parse_project_list(resp.body.data))
+        data = resp.body.data
+        biz_usage = data[0].biz_usage if data else "inverse_rendering"
+        return project_list_html(parse_project_list(data), biz_usage=biz_usage)
     except:
         raise gr.exceptions.Error("获取数据失败，请刷新重试。")
 
@@ -135,7 +137,11 @@ def project_helper_btn_on_click(model_url_txt, glb_model_url_txt):
             source_video.update(value=model_samples[0]["video"]),
             model_state_container.update(visible=False),
             remote_model_viewer.update(visible=True,
-                                       value=single_model_viewer_iframe(model_url_txt, glb_model_url_txt, "", True))
+                                       value=single_model_viewer_iframe(model_url_txt,
+                                                                        glb_model_url_txt,
+                                                                        "",
+                                                                        "inverse_rendering",
+                                                                        True))
         ]
     else:
         return [
@@ -199,17 +205,17 @@ def search_btn_on_click(jwt_txt, input_type, txt, image):
         if ret.body.code == "XR15110000000451":
             error_html = f"<span style='color: red;'>{text_error}</span>"
             return [
-                search_results.update(value=project_list_html([])),
+                search_results.update(value=project_list_html([], "")),
                 search_error_label.update(visible=True, value=error_html)
             ]
         if ret.body.code == "XR15110000000454":
             error_html = f"<span style='color: red;'>{image_error}</span>"
             return [
-                search_results.update(value=project_list_html([])),
+                search_results.update(value=project_list_html([], "")),
                 search_error_label.update(visible=True, value=error_html)
             ]
         return [
-            search_results.update(value=project_list_html(ret.body.data)),
+            search_results.update(value=project_list_html(ret.body.data, biz_usage="model_search")),
             search_error_label.update(visible=False)
         ]
     except:
@@ -225,7 +231,7 @@ def search_input_changed(radio, image, txt):
         ]
     else:
         return [
-            search_btn.update(interactive=txt),
+            search_btn.update(interactive=bool(txt.strip())),
             search_error_label.update(visible=False)
         ]
 
@@ -246,8 +252,12 @@ def search_type_radio_changed(radio, image, txt):
             search_error_label.update(visible=False)
         ]
 
+# 在页面加载时获取历史记录列表
+def app_post_load(jwt):
+    print("app_post_load jwt: ", jwt)
+    return featured_projects_html.update(value=fetch_featured_projects_to_html(jwt))
 
-def gr_on_load(uuid):
+async def gr_on_load(uuid):
     print(f"Triggered fetch_uuid: {uuid}", flush=True)
 
     test_user_id = uuid #or "a28d98bc229cc31b26d226bae566cbb0"
@@ -262,8 +272,7 @@ def gr_on_load(uuid):
                 uuid_txt.update(test_user_id),
                 jwt_token_txt.update(jwt),
                 usr_email_text.update(email),
-                projects_html.update(value=fetch_project_list_to_html(jwt)),
-                featured_projects_html.update(value=fetch_featured_projects_to_html(jwt))
+                projects_html.update(value=await fetch_project_list_to_html(jwt))
             ]
         except (NameError, AttributeError):
             raise gr.exceptions.Error("用户登录失败，请刷新重试。")
@@ -273,12 +282,34 @@ def gr_on_load(uuid):
 
 with gr.Blocks(css=css) as demo:
     gr.HTML(header_html)
-    with gr.Tab("视频生成", elem_id="v2m_tab"):
+    uuid_txt = gr.Text(label="modelscope_uuid", elem_id="uuid", visible=False)
+    jwt_token_txt = gr.Text(label="modelscope_jwt_token", elem_id="jwt_token", visible=False)
+    with gr.Tab("文生3D", elem_id="t2m_tab"):
+        t2m_expression = gr.HTML("""<script id="text2objexpression">""" + json.dumps({}) + """</script>""",
+                                 visible=False)
+        t2m_input = gr.HTML(elem_id="text2obj")
+        t2m_button = gr.Button(elem_id="text2obj-button-hidden", visible=False)
+        t2m_stats = gr.State(value={"ids": {}, "details": {}})
+        t2m_output = gr.HTML(
+            """<script id="text2objoutputhtml">""" + json.dumps({"ids": {}, "details": {}}) + """</script>""",
+            visible=False)
+        t2m_json = gr.JSON(visible=False)
+        t2m_json.change(t2m_updateOutput, inputs=[t2m_json], outputs=[t2m_output])
+        t2m_ticker = gr.Label(update_time, visible=False, every=30) #每30秒轮询一遍状态
+        t2m_ticker.change(t2m_refreshModelsStatus, inputs=[t2m_input, t2m_stats], outputs=[t2m_stats, t2m_json],
+                          _js='''(i, s) => [window.getText2ObjMakingList(), s]''')
+
+        t2m_button.click(t2m_doTask, _js='''(a, b, j) => [window.getText2ObjData(), b, j]''',
+                         inputs=[t2m_input, t2m_stats, jwt_token_txt], outputs=[t2m_stats, t2m_json])
+        t2m_js = vite_js()
+        t2m_load_history_button = gr.Button(elem_id='text2obj-button-load-history', visible=False)
+        t2m_load_history_button.click(t2m_loadHistoryList, inputs=[jwt_token_txt, t2m_stats, t2m_input],
+                                      outputs=t2m_expression,
+                                      _js='''(j, s, i) => [j, s, window.getText2ObjLoadHistoryParams()]''')
+    with gr.Tab("视频生3D", elem_id="v2m_tab"):
         video_uploader_steps = gr.HTML(value=video_uploader_steps_html)
         with gr.Row():
             with gr.Column():
-                uuid_txt = gr.Text(label="modelscope_uuid", elem_id="uuid", visible=False)
-                jwt_token_txt = gr.Text(label="modelscope_jwt_token", elem_id="jwt_token", visible=False)
                 upload_helper_txt = gr.Text(label="upload_helper", elem_id="upload_helper_txt", visible=False)
                 usr_email_text = gr.Text(elem_id="user_email", visible=False)
                 update_email_btn = gr.Button(elem_id="gr_update_email_btn", visible=False)
@@ -396,29 +427,7 @@ with gr.Blocks(css=css) as demo:
                   _js="() => [document.querySelector('#jwt_token textarea').value, document.querySelector('.project_vid_container.selected').getAttribute('data-fast-project-id')] ") \
             .then(fn=None,
                   _js=project_item_click_js)
-    with gr.Tab("文本生成", elem_id="t2m_tab"):
-        t2m_expression = gr.HTML("""<script id="text2objexpression">""" + json.dumps({}) + """</script>""",
-                                 visible=False)
-        t2m_input = gr.HTML(elem_id="text2obj")
-        t2m_button = gr.Button(elem_id="text2obj-button-hidden", visible=False)
-        t2m_stats = gr.State(value={"ids": {}, "details": {}})
-        t2m_output = gr.HTML(
-            """<script id="text2objoutputhtml">""" + json.dumps({"ids": {}, "details": {}}) + """</script>""",
-            visible=False)
-        t2m_json = gr.JSON(visible=False)
-        t2m_json.change(t2m_updateOutput, inputs=[t2m_json], outputs=[t2m_output])
-        t2m_ticker = gr.Label(update_time, visible=False, every=1)
-        t2m_ticker.change(t2m_refreshModelsStatus, inputs=[t2m_input, t2m_stats], outputs=[t2m_stats, t2m_json],
-                          _js='''(i, s) => [window.getText2ObjMakingList(), s]''')
-
-        t2m_button.click(t2m_doTask, _js='''(a, b, j) => [window.getText2ObjData(), b, j]''',
-                         inputs=[t2m_input, t2m_stats, jwt_token_txt], outputs=[t2m_stats, t2m_json])
-        t2m_js = vite_js()
-        t2m_load_history_button = gr.Button(elem_id='text2obj-button-load-history', visible=False)
-        t2m_load_history_button.click(t2m_loadHistoryList, inputs=[jwt_token_txt, t2m_stats, t2m_input],
-                                      outputs=t2m_expression,
-                                      _js='''(j, s, i) => [j, s, window.getText2ObjLoadHistoryParams()]''')
-    with gr.Tab("3D模型检索", elem_id="model_search_tab"):
+    with gr.Tab("3D模型检索 (未上线)", elem_id="model_search_tab"):
         with gr.Column():
             search_type_radio = gr.Radio(["图片搜索", "文本搜索"], value="图片搜索", show_label=False, container=False,
                                          elem_id="search_type_radio")
@@ -454,13 +463,12 @@ with gr.Blocks(css=css) as demo:
                   uuid_txt,
                   jwt_token_txt,
                   usr_email_text,
-                  projects_html,
-                  featured_projects_html
+                  projects_html
               ],
               _js=app_js) \
         .then(fn=None,
               _js=app_post_load_js)
-    demo.load(t2m_htmlloaded, _js=t2m_js, inputs=None, outputs=None)
+    demo.load(fn=t2m_html_loaded, _js=t2m_js).then(fn=app_post_load, inputs=jwt_token_txt, outputs=[featured_projects_html])
 
-demo.queue()
+demo.queue(concurrency_count=300)
 demo.launch()

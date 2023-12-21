@@ -2,3 +2,10 @@ __pycache__
 node_modules
 /cypress/e2e/*.swp
 config/env_list.json
+cypress/screenshots
+cypress/results
+report.json
+mochawesome-report
+.ci
+e2eResult.json
+package-lock.json

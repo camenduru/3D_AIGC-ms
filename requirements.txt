@@ -6,4 +6,4 @@ alibabacloud-tea-util~=0.3.11
 beautifulsoup4~=4.12.2
 requests~=2.31.0
 -i https://pypi.org/simple
-alibabacloud-xrengine20230313~=2.6.0
+alibabacloud-xrengine20230313~=2.6.2

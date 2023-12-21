@@ -28,7 +28,7 @@ async () => {
     qrcode_script.setAttribute("async", "async");
     document.body.appendChild(qrcode_script);
 
-    const path = window.parent.location.pathname
+    const path = window.location.href
     const is_prod =  (path.indexOf('3D_AIGC') !== -1) //线上创空间名字为3D_AIGC
 
     if (is_prod) {
@@ -44,7 +44,7 @@ async () => {
                     behavior: true,
                     enableSPA: true
                 };
-            with (b) with (body) with (insertBefore(createElement("script"), firstChild)) setAttribute("crossorigin", "", src = d)
+            with (b) with (body) with (insertBefore(createElement("script"), firstChild)) setAttribute("crossorigin", "", src = d) // eslint-disable-line
         })(window, document, "https://sdk.rum.aliyuncs.com/v1/bl.js", "__bl");
     }
 
@@ -318,6 +318,6 @@ async () => {
         const nopromise = {
             catch: new Function()
         };
-        (video.play() || nopromise).catch(function(){});
+        (video.play() || nopromise).catch(function(){}); // eslint-disable-line
     }
 }

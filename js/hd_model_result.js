@@ -29,7 +29,7 @@
             // model_loading_div.style.display = "block";
             hd_model_actions_div.style.display = "flex";
             viewer_div.style.display = "block"
-            const url = `https://market.m.taobao.com/app/xr-paas/xr-paas-portal/index.html#/h5-modelviewer?modelUrl=${encodeURIComponent(obj.model_url)}&modelName=${encodeURIComponent(obj.name)}&bizUsage=inverse_rendering`
+            const url = `https://market.m.taobao.com/app/xr-paas/xr-paas-portal/index.html#/h5-modelviewer?modelUrl=${encodeURIComponent(obj.model_url)}&modelName=${encodeURIComponent(obj.name)}&bizUsage=inverse_rendering` // eslint-disable-line
             viewer_div.src = url
             viewer_div.onload = function () {
                 // model_loading_div.style.display = "none";

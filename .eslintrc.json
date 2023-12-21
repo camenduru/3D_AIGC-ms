@@ -1,0 +1,40 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:vue/vue3-essential"
+    ],
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "parser": "@typescript-eslint/parser",
+        "sourceType": "module"
+    },
+    "plugins": [
+        "@typescript-eslint",
+        "vue"
+    ],
+    "rules": {
+
+    "no-debugger": 2,
+    "no-unused-vars": [
+      2,
+      // we are only using this rule to check for unused arguments since TS
+      // catches unused variables but not args.
+      { "varsIgnorePattern": ".*",
+          "args": "none" }
+    ],
+    "vue/multi-word-component-names": 0,
+    "no-constant-condition": 0,
+    "vue/no-mutating-props": 0,
+    "no-async-promise-executor": 0,
+    "no-prototype-builtins": 0,
+    "@typescript-eslint/no-shadow": 2,
+    "no-empty": [2, { "allowEmptyCatch": true }],
+    "eqeqeq": 2,
+    "no-param-reassign": 0
+    }
+}

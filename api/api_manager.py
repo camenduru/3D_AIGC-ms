@@ -53,7 +53,7 @@ def create_project(client: Client, jwt, share):
     return client.pop_create_object_project(request)
 
 
-def list_projects(client: Client, jwt, size=5):
+async def list_projects(client: Client, jwt, size=5):
     """
         列出项目
 
@@ -71,7 +71,7 @@ def list_projects(client: Client, jwt, size=5):
                                           with_source=True,
                                           custom_source="model_scope",
                                           status="MAKING,MAKING_FAILED,MAKING_SUCCESS,VIEWABLE")
-    return client.pop_list_object_project(request)
+    return await client.pop_list_object_project_async(request)
 
 
 def upload_to_oss(access_id,

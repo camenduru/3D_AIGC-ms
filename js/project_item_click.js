@@ -3,7 +3,7 @@
     if (source_video) {
         source_video.src = document.querySelector('#temp_btn').textContent
         source_video.muted = true
-        source_video.play()
+        // source_video.play()
     }
     const project_item = document.querySelector(".project_vid_container.selected")
 

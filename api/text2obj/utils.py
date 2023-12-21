@@ -1,6 +1,8 @@
 import base64
 import json
 import datetime
+import time
+
 from api.text2obj.api import text2Substance, queryHistoryProjectList, queryText2ObjModelsDetail
 
 
@@ -13,7 +15,8 @@ async def t2m_doTask(task, state, jwt):
         print('[TEXT2OBJ_t2m_doTask] request:', str(request))
         prompt = request['prompts']
         _id = request['_id']
-        result = await text2Substance(jwt, prompt)
+        bizUsage = request['bizUsage']
+        result = await text2Substance(jwt, prompt, bizUsage)
         state["ids"][_id] = result
         return [state, state]
     except Exception as e:
@@ -23,7 +26,7 @@ async def t2m_doTask(task, state, jwt):
 
 
 # 在页面加载时获取历史记录列表
-def t2m_htmlloaded():
+def t2m_html_loaded():
     return None
 
 
@@ -51,20 +54,21 @@ async def t2m_refreshModelsStatus(list, states):
                 idList.append(model["id"])
         if len(idList) != 0:
             result = queryText2ObjModelsDetail(idList)
-            if (result is not None):
+            if result is not None:
+                print('[TEXT2OBJ_t2m_refreshModelsStatus] result:', result)
                 for projectDetail in result:
                     status = projectDetail['status']
                     dataset = projectDetail['dataset']
                     modelId = projectDetail["id"]
-                    if status == 'VIEWABLE' or (dataset["buildResultUrl"] is not None and "whiteModel" in dataset[
-                        "buildResultUrl"]) or status == 'MAKING_FAILED':
-                        states["details"][modelId] = {
-                            "timestamp": str(datetime.datetime.now().time()),
-                            "success": True,
-                            "id": modelId,
-                            "status": status,
-                            "dataset": dataset
-                        }
+                    # if status == 'VIEWABLE' or status == 'MAKING_FAILED':
+                    states["details"][modelId] = {
+                        "timestamp": str(time.time()),
+                        "success": True,
+                        "id": modelId,
+                        "status": status,
+                        "dataset": dataset,
+                        'bizUsage': projectDetail['bizUsage']
+                    }
     except Exception as e:
         print('[TEXT2OBJ_t2m_refreshModelsStatus] error:', e)
     finally:
