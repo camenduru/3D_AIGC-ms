@@ -614,6 +614,10 @@ a[data-tooltip]:hover:before {
     content: url("https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/double_arrow.png&View=true");
 }
 
+#banner {
+    content: url("https://modelscope.cn/api/v1/studio/Damo_XR_Lab/3D_AIGC/repo?Revision=master&FilePath=resource/banner.jpg&View=true");
+}
+
 @media screen and (max-width: 480px) {
     .model_video_item_container {
         width: 49%;
